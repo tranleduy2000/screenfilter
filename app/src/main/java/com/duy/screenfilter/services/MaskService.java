@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.annotation.ColorInt;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -43,6 +44,8 @@ public class MaskService extends Service {
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
     private AppSetting mSettings;
+    @ColorInt
+    private int color = Color.BLACK;
 
     @Override
     public void onCreate() {
@@ -70,7 +73,7 @@ public class MaskService extends Service {
     private void createMaskView() {
         mAccessibilityManager.isEnabled();
 
-        updateLayoutParams(mode, -1);
+        updateLayoutParams(mode, -1, color);
         mLayoutParams.gravity = Gravity.CENTER;
 
         if (mLayout == null) {
@@ -94,7 +97,7 @@ public class MaskService extends Service {
         }
     }
 
-    private void updateLayoutParams(int mode, int paramInt) {
+    private void updateLayoutParams(int mode, int brightness, int color) {
         if (mLayoutParams == null) mLayoutParams = new LayoutParams();
 
         this.mAccessibilityManager.isEnabled();
@@ -120,7 +123,7 @@ public class MaskService extends Service {
             mLayoutParams.flags &= 0xFFDFFFFF;
             mLayoutParams.flags &= 0xFFFFFF7F;
             mLayoutParams.format = PixelFormat.OPAQUE;
-            mLayoutParams.dimAmount = constrain((100 - paramInt) / 100.0F, 0.0F, 0.9F);
+            mLayoutParams.dimAmount = constrain((100 - brightness) / 100.0F, 0.0F, 0.9F);
         } else {
             int max = Math.max(Utility.getTrueScreenWidth(this), Utility.getTrueScreenHeight(this));
             mLayoutParams.height = mLayoutParams.width = max + 200;
@@ -128,8 +131,8 @@ public class MaskService extends Service {
                     | LayoutParams.FLAG_NOT_FOCUSABLE
                     | LayoutParams.FLAG_LAYOUT_NO_LIMITS;
             mLayoutParams.format = PixelFormat.TRANSPARENT;
-            float targetAlpha = (100 - brightness) * 0.01f;
-            if (paramInt != -1) {
+            float targetAlpha = (100 - this.brightness) * 0.01f;
+            if (brightness != -1) {
                 if (isShowing) {
                     if (Math.abs(targetAlpha - mLayout.getAlpha()) < 0.1f) {
                         mLayout.setAlpha(targetAlpha);
@@ -143,7 +146,9 @@ public class MaskService extends Service {
         }
 
         if (mLayout != null) {
-            mLayout.setBackgroundColor(mSettings.getFilterColor());
+            int targetAlpha = (int) ((100 - this.brightness) * 0.01f * 255);
+            mLayout.setBackgroundColor(Color.argb(targetAlpha,
+                    Color.red(color), Color.green(color), Color.blue(color)));
         }
     }
 
@@ -269,7 +274,6 @@ public class MaskService extends Service {
 
         if (intent != null && intent.hasExtra(Constants.EXTRA_ACTION)) {
             String action = intent.getStringExtra(Constants.EXTRA_ACTION);
-            brightness = intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0);
             mode = intent.getIntExtra(Constants.EXTRA_MODE, mode);
 
             switch (action) {
@@ -282,7 +286,10 @@ public class MaskService extends Service {
                 case Constants.ACTION_STOP:
                     this.stop(intent);
                     break;
-                case Constants.ACTION_UPDATE:
+                case Constants.ACTION_UPDATE_BRIGHTNESS:
+                    update(intent);
+                    break;
+                case Constants.ACTION_UPDATE_COLOR:
                     update(intent);
                     break;
             }
@@ -318,7 +325,7 @@ public class MaskService extends Service {
         createNotification();
         startForeground(NOTIFICATION_NO, mNoti);
 
-        updateLayoutParams(mode, brightness);
+        updateLayoutParams(mode, brightness, color);
         mWindowManager.updateViewLayout(mLayout, mLayoutParams);
 
         isShowing = true;
@@ -335,12 +342,18 @@ public class MaskService extends Service {
     }
 
     private void update(Intent intent) {
-        mAccessibilityManager.isEnabled();
         Log.i(TAG, "Update Mask");
+        if (intent.hasExtra(Constants.EXTRA_BRIGHTNESS)) {
+            brightness = intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0);
+        }
+        if (intent.hasExtra(Constants.EXTRA_COLOR)) {
+            color = intent.getIntExtra(Constants.EXTRA_COLOR, Color.BLACK);
+        }
+
+        mAccessibilityManager.isEnabled();
         isShowing = true;
-        updateLayoutParams(mode, brightness);
+        updateLayoutParams(mode, brightness, color);
         mWindowManager.updateViewLayout(mLayout, mLayoutParams);
-        Log.i(TAG, "Set alpha:" + String.valueOf(100 - intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0)));
     }
 
     @Override

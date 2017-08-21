@@ -1,6 +1,7 @@
 package com.duy.screenfilter.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
+import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.utils.AppSetting;
 
 /**
@@ -20,11 +23,13 @@ class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> {
     private final int[] colors;
     private LayoutInflater inflater;
     private AppSetting setting;
+    private Context context;
 
     public ColorAdapter(Context context) {
         this.colors = context.getResources().getIntArray(R.array.filter_colors);
         this.inflater = LayoutInflater.from(context);
         this.setting = AppSetting.newInstance(context);
+        this.context = context;
     }
 
     @Override
@@ -39,6 +44,10 @@ class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 setting.setFilterColor(colors[holder.getAdapterPosition()]);
+                Intent intent = new Intent(context, MaskService.class);
+                intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE_COLOR);
+                intent.putExtra(Constants.EXTRA_COLOR, colors);
+                context.startService(intent);
             }
         });
     }

@@ -150,7 +150,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 v = value;
                 if (isRunning) {
                     Intent intent = new Intent(MainActivity.this, MaskService.class);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
+                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE_BRIGHTNESS);
                     intent.putExtra(Constants.EXTRA_BRIGHTNESS, mSeekbar.getProgress());
                     intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
                     startService(intent);
