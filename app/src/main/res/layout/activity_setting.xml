@@ -15,7 +15,7 @@
     <android.support.v7.widget.CardView
         android:id="@+id/the_animation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_gravity="top"
         android:layout_margin="8dp"
         android:clickable="true"

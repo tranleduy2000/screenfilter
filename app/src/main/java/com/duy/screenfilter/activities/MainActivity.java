@@ -68,6 +68,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     private AlertDialog mAlertDialog, mModeDialog;
     private int targetMode;
     private AppSetting mSetting;
+    private boolean isAnimateRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,37 +79,39 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             setTheme(R.style.AppTheme_Dark);
         }
         setContentView(R.layout.activity_setting);
-        //findViewById(R.id.root_layout).setVisibility(View.INVISIBLE);
+        View animationView = findViewById(R.id.the_animation);
+        animationView.setVisibility(View.INVISIBLE);
         bindView();
+        animationView.post(new Runnable() {
+            @Override
+            public void run() {
+                startAnimate(true, false);
+            }
+        });
+
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //     startAnimate();
-    }
-
-    private void startAnimate(boolean finish) {
+    private void startAnimate(boolean open, final boolean finish) {
         View view = findViewById(R.id.the_animation);
         int cx = view.getWidth() / 2;
         int cy = view.getHeight() / 2;
         int radius = (int) Math.hypot(cx, cy);
         Animator animator;
-        if (!(view.getVisibility() == View.VISIBLE)) {
+        if (open) {
             animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, radius);
-            findViewById(R.id.root_layout).setVisibility(View.VISIBLE);
-        }else {
+            findViewById(R.id.the_animation).setVisibility(View.VISIBLE);
+        } else {
             animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, radius, 0);
             animator.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
-
+                    isAnimateRunning = false;
                 }
 
                 @Override
                 public void onAnimationEnd(Animator animator) {
                     findViewById(R.id.root_layout).setVisibility(View.INVISIBLE);
-                    MainActivity.super.finish();
+                    if (finish) MainActivity.super.finish();
                 }
 
                 @Override
@@ -127,12 +130,14 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
     @Override
     public void finish() {
-        startAnimate(true);
+        if (!isAnimateRunning) {
+            startAnimate(false, true);
+        }
     }
 
     @Override
     public void onBackPressed() {
-       super.onBackPressed();
+        super.onBackPressed();
     }
 
 
