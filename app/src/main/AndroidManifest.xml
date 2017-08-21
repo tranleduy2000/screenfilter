@@ -13,7 +13,6 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:persistent="true"
-        android:roundIcon="@mipmap/ic_launcher_circle"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Light"
         tools:ignore="ManifestResource,UnusedAttribute">
@@ -33,20 +32,6 @@
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts"/>
-        </activity>
-
-        <activity
-            android:name=".activities.ToggleActivity"
-            android:excludeFromRecents="true"
-            android:finishOnTaskLaunch="true"
-            android:icon="@drawable/ic_shortcut_switch"
-            android:label="@string/shortcut_label_switch"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.Empty">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
-            </intent-filter>
         </activity>
 
         <service
@@ -69,11 +54,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".activities.ToggleActivity$MessageReceiver">
-            <intent-filter>
-                <action android:name="info.papdt.blackbulb.ACTION_TOGGLE"/>
-            </intent-filter>
-        </receiver>
 
     </application>
 

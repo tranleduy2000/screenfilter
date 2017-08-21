@@ -105,7 +105,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             animator.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animator) {
-                    isAnimateRunning = false;
+                    isAnimateRunning = true;
                 }
 
                 @Override
@@ -435,8 +435,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         if (id == R.id.action_dark_theme) {
             mSetting.putBoolean(AppSetting.KEY_DARK_THEME, !menuItem.isChecked());
             menuItem.setChecked(!menuItem.isChecked());
-            finish();
-            startActivity(new Intent(this, MainActivity.class));
+            recreate();
             return true;
         }
         return false;
