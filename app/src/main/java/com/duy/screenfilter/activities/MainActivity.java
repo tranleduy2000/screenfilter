@@ -1,5 +1,6 @@
 package com.duy.screenfilter.activities;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -20,6 +21,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
@@ -76,8 +78,63 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             setTheme(R.style.AppTheme_Dark);
         }
         setContentView(R.layout.activity_setting);
+        //findViewById(R.id.root_layout).setVisibility(View.INVISIBLE);
         bindView();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //     startAnimate();
+    }
+
+    private void startAnimate(boolean finish) {
+        View view = findViewById(R.id.the_animation);
+        int cx = view.getWidth() / 2;
+        int cy = view.getHeight() / 2;
+        int radius = (int) Math.hypot(cx, cy);
+        Animator animator;
+        if (!(view.getVisibility() == View.VISIBLE)) {
+            animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, radius);
+            findViewById(R.id.root_layout).setVisibility(View.VISIBLE);
+        }else {
+            animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, radius, 0);
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    findViewById(R.id.root_layout).setVisibility(View.INVISIBLE);
+                    MainActivity.super.finish();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+        }
+        animator.start();
+    }
+
+    @Override
+    public void finish() {
+        startAnimate(true);
+    }
+
+    @Override
+    public void onBackPressed() {
+       super.onBackPressed();
+    }
+
 
     private void bindView() {
 
