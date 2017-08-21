@@ -25,6 +25,7 @@ import com.duy.screenfilter.R;
 import com.duy.screenfilter.activities.MainActivity;
 import com.duy.screenfilter.utils.Utility;
 
+import static android.R.attr.max;
 import static android.view.WindowManager.LayoutParams;
 
 public class MaskService extends Service {
@@ -68,7 +69,8 @@ public class MaskService extends Service {
         sendBroadcast(intent);
     }
 
-    private void createMaskView() {
+    private void createMaskView(Intent startIntent) {
+        color = startIntent.getIntExtra(Constants.EXTRA_COLOR, color);
         mAccessibilityManager.isEnabled();
 
         updateLayoutParams(mode, -1, color);
@@ -79,7 +81,7 @@ public class MaskService extends Service {
             mLayout.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
-            mLayout.setBackgroundColor(Color.BLACK);
+            mLayout.setBackgroundColor(color);
             mLayout.setAlpha(0f);
         }
 
@@ -96,7 +98,8 @@ public class MaskService extends Service {
     }
 
     private void updateLayoutParams(int mode, int brightness, int color) {
-        Log.d(TAG, "updateLayoutParams() called with: mode = [" + mode + "], brightness = [" + brightness + "]");
+        Log.d(TAG, "updateLayoutParams() called with: mode = [" + mode +
+                "], brightness = [" + brightness + "] color = " + Integer.toHexString(color));
 
         if (mLayoutParams == null) mLayoutParams = new LayoutParams();
 
@@ -111,14 +114,14 @@ public class MaskService extends Service {
                 break;
         }
         if (mode == Constants.MODE_OVERLAY_ALL) {
-            mLayoutParams.width = 0;
-            mLayoutParams.height = 0;
+            int max = Math.max(Utility.getTrueScreenWidth(this), Utility.getTrueScreenHeight(this));
+            mLayoutParams.height = mLayoutParams.width = max + 200;
             mLayoutParams.flags |= LayoutParams.FLAG_DIM_BEHIND;
             mLayoutParams.flags |= LayoutParams.FLAG_NOT_FOCUSABLE;
             mLayoutParams.flags |= LayoutParams.FLAG_NOT_TOUCHABLE;
-            mLayoutParams.flags &= 0xFFDFFFFF;
-            mLayoutParams.flags &= 0xFFFFFF7F;
-            mLayoutParams.format = PixelFormat.OPAQUE;
+//            mLayoutParams.flags &= 0xFFDFFFFF;
+//            mLayoutParams.flags &= 0xFFFFFF7F;
+            mLayoutParams.format = PixelFormat.TRANSPARENT;
             mLayoutParams.dimAmount = constrain((100 - brightness) / 100.0F, 0.0F, 0.9F);
         } else {
             int max = Math.max(Utility.getTrueScreenWidth(this), Utility.getTrueScreenHeight(this));
@@ -127,23 +130,25 @@ public class MaskService extends Service {
                     | LayoutParams.FLAG_NOT_FOCUSABLE
                     | LayoutParams.FLAG_LAYOUT_NO_LIMITS;
             mLayoutParams.format = PixelFormat.TRANSPARENT;
-            float targetAlpha = (100 - this.brightness) * 0.01f;
-            if (brightness != -1) {
-                if (isShowing) {
-                    if (Math.abs(targetAlpha - mLayout.getAlpha()) < 0.1f) {
-                        mLayout.setAlpha(targetAlpha);
-                    } else {
-                        mLayout.animate().alpha(targetAlpha).setDuration(100).start();
-                    }
+
+        }
+
+        float targetAlpha = (100 - this.brightness) * 0.01f;
+        if (brightness != -1) {
+            if (isShowing) {
+                if (Math.abs(targetAlpha - mLayout.getAlpha()) < 0.1f) {
+                    mLayout.setAlpha(targetAlpha);
                 } else {
-                    mLayout.animate().alpha(targetAlpha).setDuration(ANIMATE_DURATION_MILES).start();
+                    mLayout.animate().alpha(targetAlpha).setDuration(100).start();
                 }
+            } else {
+                mLayout.animate().alpha(targetAlpha).setDuration(ANIMATE_DURATION_MILES).start();
             }
         }
 
         if (mLayout != null) {
-            int targetAlpha = (int) ((100 - this.brightness) * 0.01f * 255);
-            mLayout.setBackgroundColor(Color.argb(targetAlpha,
+            int alpha = (int) ((100 - this.brightness) * 0.01f * 255);
+            mLayout.setBackgroundColor(Color.argb(alpha,
                     Color.red(color), Color.green(color), Color.blue(color)));
         }
     }
@@ -317,7 +322,7 @@ public class MaskService extends Service {
 
     private void start(Intent intent) {
         Log.i(TAG, "Start Mask");
-        if (mLayout == null) createMaskView();
+        if (mLayout == null) createMaskView(intent);
 
         createNotification();
         startForeground(NOTIFICATION_NO, mNoti);

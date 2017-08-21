@@ -446,7 +446,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         mSetting.setFilterColor(color);
         if (isRunning) {
             Intent intent = new Intent(this, MaskService.class);
-            intent.setAction(ACTION_UPDATE_STATUS);
             intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE_COLOR);
             intent.putExtra(Constants.EXTRA_COLOR, color);
             intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);

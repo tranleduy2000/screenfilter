@@ -29,6 +29,7 @@ public class TileReceiver extends BroadcastReceiver {
                     Intent intent1 = new Intent(context, MaskService.class);
                     intent1.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
                     intent1.putExtra(Constants.EXTRA_BRIGHTNESS, settings.getInt(AppSetting.KEY_BRIGHTNESS, brightness));
+                    intent1.putExtra(Constants.EXTRA_COLOR, settings.getFilterColor());
                     intent1.putExtra(Constants.EXTRA_MODE, settings.getInt(AppSetting.KEY_MODE, Constants.MODE_NORMAL));
                     intent1.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, dontSendCheck);
                     context.startService(intent1);
@@ -37,6 +38,7 @@ public class TileReceiver extends BroadcastReceiver {
                     Intent intent2 = new Intent(context, MaskService.class);
                     intent2.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
                     intent2.putExtra(Constants.EXTRA_BRIGHTNESS, settings.getInt(AppSetting.KEY_BRIGHTNESS, brightness));
+                    intent2.putExtra(Constants.EXTRA_COLOR, settings.getFilterColor());
                     intent2.putExtra(Constants.EXTRA_MODE, settings.getInt(AppSetting.KEY_MODE, Constants.MODE_NORMAL));
                     intent2.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, dontSendCheck);
                     context.startService(intent2);
