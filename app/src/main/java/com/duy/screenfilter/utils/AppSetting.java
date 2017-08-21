@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import com.duy.screenfilter.R;
 
 @SuppressLint("CommitPrefEdits")
-public class NightScreenSettings {
+public class AppSetting {
 
     public static final String PREFERENCES_NAME = "settings";
 
@@ -21,16 +21,16 @@ public class NightScreenSettings {
     private SharedPreferences mPrefs;
     private Context context;
 
-    private NightScreenSettings(Context context) {
+    private AppSetting(Context context) {
         mPrefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
         this.context = context;
     }
 
-    public static NightScreenSettings newInstance(Context context) {
-        return new NightScreenSettings(context);
+    public static AppSetting newInstance(Context context) {
+        return new AppSetting(context);
     }
 
-    public NightScreenSettings putBoolean(String key, boolean value) {
+    public AppSetting putBoolean(String key, boolean value) {
         mPrefs.edit().putBoolean(key, value).apply();
         return this;
     }
@@ -39,7 +39,7 @@ public class NightScreenSettings {
         return mPrefs.getBoolean(key, def);
     }
 
-    public NightScreenSettings putInt(String key, int value) {
+    public AppSetting putInt(String key, int value) {
         mPrefs.edit().putInt(key, value).apply();
         return this;
     }
@@ -53,7 +53,7 @@ public class NightScreenSettings {
         return defValue;
     }
 
-    public NightScreenSettings putString(String key, String value) {
+    public AppSetting putString(String key, String value) {
         mPrefs.edit().putString(key, value).apply();
         return this;
     }
@@ -66,5 +66,10 @@ public class NightScreenSettings {
     public int getFilterColor() {
         return getInt(context.getString(R.string.key_pref_color),
                 context.getResources().getColor(R.color.grey_800));
+    }
+
+
+    public void setFilterColor(int color) {
+        mPrefs.edit().putInt(context.getString(R.string.key_pref_color), color).apply();
     }
 }

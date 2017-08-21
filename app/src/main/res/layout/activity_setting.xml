@@ -24,20 +24,19 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/toolbar_height"
+                android:layout_height="?android:attr/actionBarSize"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginStart="24dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_logo_teal"
                     android:tint="?attr/icon_tint"/>
@@ -53,13 +52,12 @@
                 <include
                     layout="@layout/widget_switch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="match_parent"/>
 
                 <ImageButton
                     android:id="@+id/btn_scheduler"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginEnd="4dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
@@ -70,7 +68,6 @@
                     android:id="@+id/btn_menu"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginEnd="12dp"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:paddingLeft="12dp"
                     android:paddingRight="12dp"
@@ -83,45 +80,30 @@
                 android:id="@+id/seek_bar"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginBottom="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
                 app:dsb_indicatorColor="?attr/progress_bar_color"
                 app:dsb_max="100"
                 app:dsb_min="25"
                 app:dsb_progressColor="?attr/progress_bar_color"
                 app:dsb_trackColor="?attr/progress_bar_color"/>
 
-            <FrameLayout
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/container_color"
                 android:layout_width="match_parent"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="16dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:orientation="horizontal">
+                android:layout_height="@dimen/color_height"
+                android:padding="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:text="@string/text_dark"
-                    android:textColor="?attr/icon_tint"/>
+            </android.support.v7.widget.RecyclerView>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:text="@string/text_light"
-                    android:textColor="?attr/icon_tint"/>
-
-            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/mode_view_container"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="48dp"
                 android:background="#2a000000"
                 android:foreground="?android:attr/selectableItemBackground"
                 android:gravity="center">

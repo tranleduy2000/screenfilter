@@ -15,6 +15,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +31,7 @@ import com.duy.screenfilter.R;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.services.TileReceiver;
 import com.duy.screenfilter.ui.adapter.ModeListAdapter;
-import com.duy.screenfilter.utils.NightScreenSettings;
+import com.duy.screenfilter.utils.AppSetting;
 import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
@@ -61,14 +63,14 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
     private PopupMenu popupMenu;
     private AlertDialog mAlertDialog, mModeDialog;
     private int targetMode;
-    private NightScreenSettings mNightScreenSettings;
+    private AppSetting mAppSetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mNightScreenSettings = NightScreenSettings.newInstance(getApplicationContext());
+        mAppSetting = AppSetting.newInstance(getApplicationContext());
         initWindow();
-        if (mNightScreenSettings.getBoolean(NightScreenSettings.KEY_DARK_THEME, false)) {
+        if (mAppSetting.getBoolean(AppSetting.KEY_DARK_THEME, false)) {
             setTheme(R.style.AppTheme_Dark);
         }
         setContentView(R.layout.activity_setting);
@@ -89,7 +91,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                     isRunning = true;
 
                     // For safe
-                    if (mNightScreenSettings.getBoolean(NightScreenSettings.KEY_FIRST_RUN, true)) {
+                    if (mAppSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
                         if (mAlertDialog != null && mAlertDialog.isShowing()) {
                             return;
                         }
@@ -101,7 +103,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         hasDismissFirstRunDialog = true;
-                                        mNightScreenSettings.putBoolean(NightScreenSettings.KEY_FIRST_RUN, false);
+                                        mAppSetting.putBoolean(AppSetting.KEY_FIRST_RUN, false);
                                     }
                                 })
                                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -110,7 +112,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                                         if (hasDismissFirstRunDialog) return;
                                         hasDismissFirstRunDialog = true;
                                         mSwitch.toggle();
-                                        if (mNightScreenSettings.getBoolean(NightScreenSettings.KEY_FIRST_RUN, true)) {
+                                        if (mAppSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
                                             Intent intent = new Intent(LaunchActivity.this, MaskService.class);
                                             intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
                                             stopService(intent);
@@ -139,7 +141,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         });
 
         mSeekbar = findViewById(R.id.seek_bar);
-        mSeekbar.setProgress(mNightScreenSettings.getInt(NightScreenSettings.KEY_BRIGHTNESS, 50));
+        mSeekbar.setProgress(mAppSetting.getInt(AppSetting.KEY_BRIGHTNESS, 50));
         mSeekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             int v = -1;
 
@@ -163,13 +165,13 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
             @Override
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
                 if (v != -1) {
-                    mNightScreenSettings.putInt(NightScreenSettings.KEY_BRIGHTNESS, v);
+                    mAppSetting.putInt(AppSetting.KEY_BRIGHTNESS, v);
                 }
             }
         });
 
         mModeText = findViewById(R.id.mode_view);
-        int mode = mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, Constants.MODE_NO_PERMISSION);
+        int mode = mAppSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
         mModeText.setText(getResources().getStringArray(R.array.mode_text)[mode]
                 + ((mode == Constants.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 ? " " + getString(R.string.mode_text_no_permission_warning)
@@ -177,7 +179,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         findViewById(R.id.mode_view_container).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int current = mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, Constants.MODE_NO_PERMISSION);
+                int current = mAppSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
                 mModeDialog = new AlertDialog.Builder(LaunchActivity.this)
                         .setTitle(R.string.dialog_choose_mode)
                         .setSingleChoiceItems(
@@ -235,7 +237,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         popupMenu.getMenuInflater().inflate(R.menu.menu_settings, popupMenu.getMenu());
         popupMenu.getMenu()
                 .findItem(R.id.action_dark_theme)
-                .setChecked(mNightScreenSettings.getBoolean(NightScreenSettings.KEY_DARK_THEME, false));
+                .setChecked(mAppSetting.getBoolean(AppSetting.KEY_DARK_THEME, false));
         popupMenu.setOnMenuItemClickListener(this);
         menuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -246,7 +248,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         menuBtn.setOnTouchListener(popupMenu.getDragToOpenListener());
 
         mSchedulerBtn = findViewById(R.id.btn_scheduler);
-        if (mNightScreenSettings.getBoolean(NightScreenSettings.KEY_AUTO_MODE, false)) {
+        if (mAppSetting.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
             mSchedulerBtn.setImageResource(R.drawable.ic_alarm_black_24dp);
         } else {
             mSchedulerBtn.setImageResource(R.drawable.ic_alarm_off_black_24dp);
@@ -288,6 +290,11 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
             }
         });
 
+        RecyclerView recyclerView = findViewById(R.id.container_color);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerView.setAdapter(new ColorAdapter(this));
+
         FrameLayout rootLayout = findViewById(R.id.root_layout);
         rootLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -309,7 +316,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         new SchedulerDialog(this, new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                if (mNightScreenSettings.getBoolean(NightScreenSettings.KEY_AUTO_MODE, false)) {
+                if (mAppSetting.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
                     mSchedulerBtn.setImageResource(R.drawable.ic_alarm_black_24dp);
                 } else {
                     mSchedulerBtn.setImageResource(R.drawable.ic_alarm_off_black_24dp);
@@ -321,7 +328,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
     @Override
     public void onPause() {
         super.onPause();
-        mNightScreenSettings.putInt(NightScreenSettings.KEY_BRIGHTNESS, mSeekbar.getProgress());
+        mAppSetting.putInt(AppSetting.KEY_BRIGHTNESS, mSeekbar.getProgress());
     }
 
     @Override
@@ -343,7 +350,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
 
 
     private void applyNewMode(int targetMode) {
-        if (isRunning && targetMode != mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, Constants.MODE_NO_PERMISSION)) {
+        if (isRunning && targetMode != mAppSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION)) {
             mSwitch.toggle();
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -352,7 +359,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                 }
             }, 500);
         }
-        mNightScreenSettings.putInt(NightScreenSettings.KEY_MODE, targetMode);
+        mAppSetting.putInt(AppSetting.KEY_MODE, targetMode);
         mModeText.setText(getResources().getStringArray(R.array.mode_text)[targetMode]
                 + ((targetMode == Constants.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 ? " " + getString(R.string.mode_text_no_permission_warning)
@@ -363,7 +370,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
     public boolean onMenuItemClick(final MenuItem menuItem) {
         int id = menuItem.getItemId();
         if (id == R.id.action_dark_theme) {
-            mNightScreenSettings.putBoolean(NightScreenSettings.KEY_DARK_THEME, !menuItem.isChecked());
+            mAppSetting.putBoolean(AppSetting.KEY_DARK_THEME, !menuItem.isChecked());
             menuItem.setChecked(!menuItem.isChecked());
             finish();
             startActivity(new Intent(this, LaunchActivity.class));

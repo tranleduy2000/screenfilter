@@ -12,7 +12,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.duy.screenfilter.R;
-import com.duy.screenfilter.utils.NightScreenSettings;
+import com.duy.screenfilter.utils.AppSetting;
 import com.duy.screenfilter.utils.Utility;
 import com.github.florent37.diagonallayout.DiagonalLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -29,7 +29,7 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
 
     private int hrsSunrise = 6, minSunrise = 0, hrsSunset = 22, minSunset = 0;
 
-    private NightScreenSettings mSettings;
+    private AppSetting mSettings;
 
     public SchedulerDialog(Context context) {
         super(context);
@@ -57,11 +57,11 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
     }
 
     private void init() {
-        mSettings = NightScreenSettings.newInstance(getContext());
-        hrsSunrise = mSettings.getInt(NightScreenSettings.KEY_HOURS_SUNRISE, 6);
-        minSunrise = mSettings.getInt(NightScreenSettings.KEY_MINUTES_SUNRISE, 0);
-        hrsSunset = mSettings.getInt(NightScreenSettings.KEY_HOURS_SUNSET, 22);
-        minSunset = mSettings.getInt(NightScreenSettings.KEY_MINUTES_SUNSET, 0);
+        mSettings = AppSetting.newInstance(getContext());
+        hrsSunrise = mSettings.getInt(AppSetting.KEY_HOURS_SUNRISE, 6);
+        minSunrise = mSettings.getInt(AppSetting.KEY_MINUTES_SUNRISE, 0);
+        hrsSunset = mSettings.getInt(AppSetting.KEY_HOURS_SUNSET, 22);
+        minSunset = mSettings.getInt(AppSetting.KEY_MINUTES_SUNSET, 0);
 
         View rootView = getLayoutInflater().inflate(R.layout.dialog_scheduler, null);
         setView(rootView);
@@ -88,11 +88,11 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
         sunsetTime.setText(String.format(Locale.getDefault(), "%1$02d:%2$02d", hrsSunset, minSunset));
 
         Switch switchView = rootView.findViewById(R.id.auto_switch);
-        switchView.setChecked(mSettings.getBoolean(NightScreenSettings.KEY_AUTO_MODE, false));
+        switchView.setChecked(mSettings.getBoolean(AppSetting.KEY_AUTO_MODE, false));
         switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                mSettings.putBoolean(NightScreenSettings.KEY_AUTO_MODE, b);
+                mSettings.putBoolean(AppSetting.KEY_AUTO_MODE, b);
                 Utility.updateAlarmSettings(getContext());
             }
         });
@@ -112,7 +112,7 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
                         minSunrise,
                         true
                 );
-                if (mSettings.getBoolean(NightScreenSettings.KEY_DARK_THEME, false)) {
+                if (mSettings.getBoolean(AppSetting.KEY_DARK_THEME, false)) {
                     sunrisePicker.setThemeDark(true);
                 }
                 sunrisePicker.show(getOwnerActivity().getFragmentManager(), "sunrise_dialog");
@@ -127,7 +127,7 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
                         minSunset,
                         true
                 );
-                if (mSettings.getBoolean(NightScreenSettings.KEY_DARK_THEME, false)) {
+                if (mSettings.getBoolean(AppSetting.KEY_DARK_THEME, false)) {
                     sunsetPicker.setThemeDark(true);
                 }
                 sunsetPicker.show(getOwnerActivity().getFragmentManager(), "sunset_dialog");
@@ -141,14 +141,14 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
             hrsSunrise = hourOfDay;
             minSunrise = minute;
             sunriseTime.setText(String.format(Locale.getDefault(), "%1$02d:%2$02d", hrsSunrise, minSunrise));
-            mSettings.putInt(NightScreenSettings.KEY_HOURS_SUNRISE, hrsSunrise);
-            mSettings.putInt(NightScreenSettings.KEY_MINUTES_SUNRISE, minSunrise);
+            mSettings.putInt(AppSetting.KEY_HOURS_SUNRISE, hrsSunrise);
+            mSettings.putInt(AppSetting.KEY_MINUTES_SUNRISE, minSunrise);
         } else if (view == sunsetPicker) {
             hrsSunset = hourOfDay;
             minSunset = minute;
             sunsetTime.setText(String.format(Locale.getDefault(), "%1$02d:%2$02d", hrsSunset, minSunset));
-            mSettings.putInt(NightScreenSettings.KEY_HOURS_SUNSET, hrsSunset);
-            mSettings.putInt(NightScreenSettings.KEY_MINUTES_SUNSET, minSunset);
+            mSettings.putInt(AppSetting.KEY_HOURS_SUNSET, hrsSunset);
+            mSettings.putInt(AppSetting.KEY_MINUTES_SUNSET, minSunset);
         }
         Utility.updateAlarmSettings(getContext());
     }

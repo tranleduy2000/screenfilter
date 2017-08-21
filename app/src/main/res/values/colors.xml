@@ -20,6 +20,7 @@
 
 	<color name="ripple_foreground_light">#6fffffff</color>
 
+	<color name="black">#000</color>
 	<color name="lime_700">#afb42b</color>
 	<color name="grey_800">#424242</color>
 	<color name="brown_500">#795548</color>
@@ -29,6 +30,7 @@
 	<color name="green_700">#388e3c</color>
 
 	<integer-array name="filter_colors">
+		<item>@color/black</item>
 		<item>@color/lime_700</item>
 		<item>@color/grey_800</item>
 		<item>@color/brown_500</item>
