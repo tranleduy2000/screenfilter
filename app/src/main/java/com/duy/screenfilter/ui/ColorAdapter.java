@@ -34,7 +34,7 @@ class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.color.setBackgroundColor(colors[position]);
+        holder.color.setCardBackgroundColor(colors[position]);
         holder.color.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

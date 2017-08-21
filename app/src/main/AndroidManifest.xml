@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme.Light"
         tools:ignore="ManifestResource,UnusedAttribute">
         <activity
-            android:name=".ui.LaunchActivity"
+            android:name=".ui.MainActivity"
             android:finishOnTaskLaunch="true"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
@@ -59,7 +59,7 @@
         </receiver>
 
 
-        <receiver android:name=".ui.LaunchActivity$MessageReceiver">
+        <receiver android:name=".ui.MainActivity$MessageReceiver">
             <intent-filter>
                 <action android:name="info.papdt.blackbulb.ACTION_UPDATE_ACTIVITY_TOGGLE" />
             </intent-filter>

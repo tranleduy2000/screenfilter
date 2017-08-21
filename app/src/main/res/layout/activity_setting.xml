@@ -94,7 +94,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/container_color"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/color_height"
+                android:layout_height="wrap_content"
                 android:padding="8dp">
 
             </android.support.v7.widget.RecyclerView>

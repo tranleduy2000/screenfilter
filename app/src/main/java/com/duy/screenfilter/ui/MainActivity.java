@@ -36,7 +36,7 @@ import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
-public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
+public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
     private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
     private static MaterialAnimatedSwitch mSwitch;
@@ -96,7 +96,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                             return;
                         }
                         hasDismissFirstRunDialog = false;
-                        mAlertDialog = new AlertDialog.Builder(LaunchActivity.this)
+                        mAlertDialog = new AlertDialog.Builder(MainActivity.this)
                                 .setTitle(R.string.dialog_first_run_title)
                                 .setMessage(R.string.dialog_first_run_message)
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -113,7 +113,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                                         hasDismissFirstRunDialog = true;
                                         mSwitch.toggle();
                                         if (mAppSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
-                                            Intent intent = new Intent(LaunchActivity.this, MaskService.class);
+                                            Intent intent = new Intent(MainActivity.this, MaskService.class);
                                             intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
                                             stopService(intent);
                                             isRunning = false;
@@ -131,7 +131,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                         }, 5000);
                     }
                 } else {
-                    Intent intent = new Intent(LaunchActivity.this, MaskService.class);
+                    Intent intent = new Intent(MainActivity.this, MaskService.class);
                     intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
                     intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
                     stopService(intent);
@@ -149,7 +149,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
                 if (isRunning) {
-                    Intent intent = new Intent(LaunchActivity.this, MaskService.class);
+                    Intent intent = new Intent(MainActivity.this, MaskService.class);
                     intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
                     intent.putExtra(Constants.EXTRA_BRIGHTNESS, mSeekbar.getProgress());
                     intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
@@ -180,7 +180,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
             @Override
             public void onClick(View v) {
                 int current = mAppSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
-                mModeDialog = new AlertDialog.Builder(LaunchActivity.this)
+                mModeDialog = new AlertDialog.Builder(MainActivity.this)
                         .setTitle(R.string.dialog_choose_mode)
                         .setSingleChoiceItems(
                                 new ModeListAdapter(current),
@@ -195,7 +195,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                                         } else {
                                             // http://stackoverflow.com/questions/32061934/permission-from-manifest-doesnt-work-in-android-6/32065680#32065680
                                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                if (!Settings.canDrawOverlays(LaunchActivity.this)) {
+                                                if (!Settings.canDrawOverlays(MainActivity.this)) {
                                                     targetMode = which;
                                                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                                             Uri.parse("package:" + getPackageName()));
@@ -205,7 +205,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                                                 }
                                             } else {
                                                 targetMode = which;
-                                                new AlertDialog.Builder(LaunchActivity.this)
+                                                new AlertDialog.Builder(MainActivity.this)
                                                         .setTitle(R.string.dialog_overlay_enable_title)
                                                         .setMessage(R.string.dialog_overlay_enable_message)
                                                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -259,7 +259,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     PowerManager pm = getSystemService(PowerManager.class);
                     if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
-                        new AlertDialog.Builder(LaunchActivity.this)
+                        new AlertDialog.Builder(MainActivity.this)
                                 .setTitle(R.string.dialog_ignore_battery_opt_title)
                                 .setMessage(R.string.dialog_ignore_battery_opt_msg)
                                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -373,7 +373,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
             mAppSetting.putBoolean(AppSetting.KEY_DARK_THEME, !menuItem.isChecked());
             menuItem.setChecked(!menuItem.isChecked());
             finish();
-            startActivity(new Intent(this, LaunchActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
             return true;
         }
         return false;

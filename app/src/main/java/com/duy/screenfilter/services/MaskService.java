@@ -20,7 +20,7 @@ import android.view.accessibility.AccessibilityManager;
 
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
-import com.duy.screenfilter.ui.LaunchActivity;
+import com.duy.screenfilter.ui.MainActivity;
 import com.duy.screenfilter.utils.AppSetting;
 import com.duy.screenfilter.utils.Utility;
 
@@ -62,7 +62,7 @@ public class MaskService extends Service {
 
     private void sendBroadcastStopService() {
         Intent intent = new Intent();
-        intent.setAction(LaunchActivity.class.getCanonicalName());
+        intent.setAction(MainActivity.class.getCanonicalName());
         intent.putExtra(Constants.EXTRA_EVENT_ID, Constants.EVENT_DESTORY_SERVICE);
         sendBroadcast(intent);
     }
@@ -88,7 +88,7 @@ public class MaskService extends Service {
             e.printStackTrace();
 
             Intent intent = new Intent();
-            intent.setAction(LaunchActivity.class.getCanonicalName());
+            intent.setAction(MainActivity.class.getCanonicalName());
             intent.putExtra(Constants.EXTRA_EVENT_ID, Constants.EVENT_CANNOT_START);
             sendBroadcast(intent);
         }
@@ -194,7 +194,7 @@ public class MaskService extends Service {
 
     private void createNotification() {
         Log.i(TAG, "Create running notification");
-        Intent openIntent = new Intent(this, LaunchActivity.class);
+        Intent openIntent = new Intent(this, MainActivity.class);
         Intent pauseIntent = new Intent();
         pauseIntent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
         Log.i(TAG, "Create " + Constants.ACTION_PAUSE + " action");
@@ -223,7 +223,7 @@ public class MaskService extends Service {
     // implement pause notification
     private void createPauseNotification() {
         Log.i(TAG, "Create paused notification");
-        Intent openIntent = new Intent(this, LaunchActivity.class);
+        Intent openIntent = new Intent(this, MainActivity.class);
         Intent resumeIntent = new Intent();
         resumeIntent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
         resumeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
