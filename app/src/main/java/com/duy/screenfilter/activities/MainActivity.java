@@ -25,13 +25,11 @@ import android.view.ViewAnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.adapter.ColorAdapter;
-import com.duy.screenfilter.adapter.ModeListAdapter;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
@@ -62,11 +60,9 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     };
     private boolean hasDismissFirstRunDialog = false;
     private DiscreteSeekBar mSeekbar;
-    private TextView mModeText;
     private ImageButton mSchedulerBtn;
     private PopupMenu popupMenu;
-    private AlertDialog mAlertDialog, mModeDialog;
-    private int targetMode;
+    private AlertDialog mAlertDialog;
     private AppSetting mSetting;
     private boolean isAnimateRunning;
 
@@ -238,61 +234,13 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             }
         });
 
-        mModeText = findViewById(R.id.mode_view);
-        int mode = mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NORMAL);
-        String msg = getResources().getStringArray(R.array.mode_text)[mode]
-                + ((mode == Constants.MODE_NORMAL && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                ? " " + getString(R.string.mode_text_no_permission_warning)
-                : "");
-        mModeText.setText(msg);
-        findViewById(R.id.mode_view_container).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int current = mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NORMAL);
-                mModeDialog = new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.dialog_choose_mode)
-                        .setSingleChoiceItems(
-                                new ModeListAdapter(current), current,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // http://stackoverflow.com/questions/32061934/permission-from-manifest-doesnt-work-in-android-6/32065680#32065680
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                            if (!Settings.canDrawOverlays(MainActivity.this)) {
-                                                targetMode = which;
-                                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                                        Uri.parse("package:" + getPackageName()));
-                                                startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-                                            } else {
-                                                applyNewMode(which);
-                                            }
-                                        } else {
-                                            targetMode = which;
-                                            new AlertDialog.Builder(MainActivity.this)
-                                                    .setTitle(R.string.dialog_overlay_enable_title)
-                                                    .setMessage(R.string.dialog_overlay_enable_message)
-                                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                                            applyNewMode(targetMode);
-                                                        }
-                                                    })
-                                                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                                            // Do nothing....
-                                                        }
-                                                    })
-                                                    .show();
-                                        }
-                                        mModeDialog.dismiss();
-                                    }
-                                }
-                        )
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(MainActivity.this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
             }
-        });
+        }
 
         ImageButton menuBtn = findViewById(R.id.btn_menu);
         popupMenu = new PopupMenu(this, menuBtn);
@@ -399,35 +347,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         mSwitch = null;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (Settings.canDrawOverlays(this)) {
-                    applyNewMode(targetMode);
-                }
-            }
-        }
-    }
-
-
-    private void applyNewMode(int targetMode) {
-        if (isRunning && targetMode != mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NORMAL)) {
-            mSwitch.toggle();
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mSwitch.toggle();
-                }
-            }, 500);
-        }
-        mSetting.putInt(AppSetting.KEY_MODE, targetMode);
-        String msg = getResources().getStringArray(R.array.mode_text)[targetMode]
-                + ((targetMode == Constants.MODE_NORMAL && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                ? " " + getString(R.string.mode_text_no_permission_warning)
-                : "");
-        mModeText.setText(msg);
-    }
 
     @Override
     public boolean onMenuItemClick(final MenuItem menuItem) {
@@ -451,6 +370,27 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
             startService(intent);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Settings.canDrawOverlays(this)) {
+                    refresh();
+                }
+            }
+        }
+    }
+
+    private void refresh() {
+        mSwitch.toggle();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mSwitch.toggle();
+            }
+        }, 500);
     }
 
     public static class MessageReceiver extends BroadcastReceiver {

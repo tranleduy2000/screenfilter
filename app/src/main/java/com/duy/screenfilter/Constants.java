@@ -8,7 +8,6 @@ public class Constants {
     public static final String EXTRA_ACTION = "action";
     public static final String EXTRA_COLOR = "color";
     public static final String EXTRA_BRIGHTNESS = "brightness";
-    public static final String EXTRA_MODE = "mode";
     public static final String EXTRA_CHECK_FROM_TOGGLE = "check_from_toggle";
     public static final String EXTRA_DO_NOT_SEND_CHECK = "dont_send_check";
 
@@ -35,6 +34,5 @@ public class Constants {
     public static final int EVENT_CHECK = 3;
 
     public static final int MODE_NORMAL = 0;
-    public static final int MODE_OVERLAY_ALL = 1;
 
 }

@@ -94,37 +94,12 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/container_color"
-                android:padding="4dp"
                 android:layout_width="match_parent"
-                android:layout_height="60dp">
+                android:layout_height="66dp"
+                android:padding="4dp">
 
             </android.support.v7.widget.RecyclerView>
 
-
-            <LinearLayout
-                android:id="@+id/mode_view_container"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="#2a000000"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/mode_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
-                    android:text="@string/mode_text_normal"
-                    android:textAppearance="@android:style/TextAppearance.Material"/>
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_chevron_right_black_24dp"
-                    android:tint="?android:attr/textColorPrimary"/>
-
-            </LinearLayout>
 
         </LinearLayout>
 

@@ -6,7 +6,6 @@ import android.graphics.Color;
 
 public class AppSetting {
     public static final String KEY_BRIGHTNESS = "brightness";
-    public static final String KEY_MODE = "mode";
     public static final String KEY_FIRST_RUN = "first_run";
     public static final String KEY_DARK_THEME = "dark_theme";
     public static final String KEY_AUTO_MODE = "auto_mode";
