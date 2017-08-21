@@ -12,7 +12,6 @@ import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.ColorInt;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -181,22 +180,23 @@ public class MaskService extends Service {
         pauseIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
         pauseIntent.putExtra(Constants.EXTRA_BRIGHTNESS, brightness);
 
-        NotificationCompat.Action pauseAction = new NotificationCompat.Action(R.drawable.ic_wb_incandescent_black_24dp,
+        Notification.Action pauseAction = new Notification.Action(
+                R.drawable.ic_wb_incandescent_black_24dp,
                 getString(R.string.notification_action_turn_off),
                 PendingIntent.getBroadcast(getBaseContext(), 0, pauseIntent, Intent.FILL_IN_DATA));
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle(getString(R.string.notification_running_title))
+        mNoti = new Notification.Builder(getApplicationContext())
+                .setContentTitle(getString(R.string.notification_running_title))
                 .setContentText(getString(R.string.notification_running_msg))
+                .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
+                .addAction(pauseAction)
+                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setAutoCancel(false)
+                .setOngoing(true)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
-                .setAutoCancel(false)
-                .setOnlyAlertOnce(true)
-                .addAction(pauseAction)
-                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0,
-                        openIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+                .build();
 
-        mNoti = builder.build();
     }
 
     // implement pause notification
@@ -211,22 +211,22 @@ public class MaskService extends Service {
         Intent closeIntent = new Intent(this, MaskService.class);
         closeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
 
-        NotificationCompat.Action resumeAction = new NotificationCompat.Action(R.drawable.ic_wb_incandescent_black_24dp,
+        Notification.Action resumeAction = new Notification.Action(R.drawable.ic_wb_incandescent_black_24dp,
                 getString(R.string.notification_action_turn_on),
                 PendingIntent.getBroadcast(getBaseContext(), 0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext())
+        mNoti = new Notification.Builder(getApplicationContext())
                 .setContentTitle(getString(R.string.notification_paused_title))
                 .setContentText(getString(R.string.notification_paused_msg))
-                .setSmallIcon(R.drawable.ic_brightness_pause)
+                .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
                 .addAction(resumeAction)
                 .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .setAutoCancel(true)
                 .setOngoing(false)
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
-                .setDeleteIntent(PendingIntent.getService(getBaseContext(), 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT));
-        mNoti = builder.build();
+                .setDeleteIntent(PendingIntent.getService(getBaseContext(), 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .build();
     }
 
     private void showPausedNotification() {

@@ -2,13 +2,9 @@
 
 	<string name="app_name">夜間螢幕</string>
 
-	<string name="action_about">關於</string>
-	<string name="action_dark_theme">暗色主題</string>
+    <string name="action_dark_theme">暗色主題</string>
 
-    <string name="dialog_overlay_enable_title">啟用覆蓋系統狀態列</string>
-	<string name="dialog_overlay_enable_message">啟用本項可以令遮罩置頂於螢幕，但在一些設備上需要得到權限（譬如 MIUI 與 Android 6.0）\n如果啟用本項後不生效，請自行去設置權限。</string>
-
-	<string name="mask_fail_to_start">無法啟用遮罩。請檢查系統是否禁止權限。</string>
+    <string name="mask_fail_to_start">無法啟用遮罩。請檢查系統是否禁止權限。</string>
 
 	<string name="dialog_first_run_title">首次啟動</string>
 	<string name="dialog_first_run_message">你能看到這條訊息嗎？如果可以，這證實夜間螢幕正常運作。\n在 5 秒之內不按“確認”會自動停止</string>
@@ -22,15 +18,10 @@
 	<string name="notification_action_turn_on">關燈</string>
 	<string name="shortcut_label_switch">切換</string>
 
-	<string name="dialog_choose_mode">選擇工作模式</string>
-
-	<string name="mode_text_no_permission">零權限模式</string>
 	<string name="mode_text_normal">常規模式</string>
 	<string name="mode_text_overlay_all">全覆蓋模式</string>
 
-    <string name="mode_text_no_permission_warning">(可能無法工作)</string>
-
-	<string name="mode_desc_no_permission">不需要任何權限，但無法覆蓋鎖定介面、狀態欄與導航欄。而且在 Android 7.0 後的系統可能無法工作。</string>
+    <string name="mode_desc_no_permission">不需要任何權限，但無法覆蓋鎖定介面、狀態欄與導航欄。而且在 Android 7.0 後的系統可能無法工作。</string>
 	<string name="mode_desc_normal">推薦模式。這是最穩定的，儘管無法變暗導航欄且導致無法進行敏感操作（如手動安裝應用程式、同意權限請求）。</string>
 	<string name="mode_desc_overlay_all">狀態欄與導航欄都可以變暗，但在部分應用程式中會出現閃爍現象。</string>
 

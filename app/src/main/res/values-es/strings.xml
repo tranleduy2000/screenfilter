@@ -2,13 +2,9 @@
 
 	<string name="app_name">Screen Filter</string>
 
-	<string name="action_about">Acerca de</string>
-	<string name="action_dark_theme">Tema oscuro</string>
+    <string name="action_dark_theme">Tema oscuro</string>
 
-	<string name="dialog_overlay_enable_title">Cubrir la barra de estado</string>
-	<string name="dialog_overlay_enable_message">Activar esto puede enmascarar la parte superior de la pantalla, pero puede que necesite permisos adicionales en algunos dispositivos (Como MIUI y Android 6.0)\nSi no funciona, por favor permítele a la aplicación mostrar ventanas de alerta del sistema.</string>
-
-	<string name="mask_fail_to_start">No se pudo enmascarar. Por favor verifica si la aplicación tiene permisos del sistema.</string>
+    <string name="mask_fail_to_start">No se pudo enmascarar. Por favor verifica si la aplicación tiene permisos del sistema.</string>
 
 	<string name="dialog_first_run_title">Primer inicio</string>
 	<string name="dialog_first_run_message">¿Puedes ver este mensaje? Si puedes, quiere decir que Screen Filter funciona bien. \nSe detendrá después de 5 segundos si no presionas OK.</string>

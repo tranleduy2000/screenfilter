@@ -2,13 +2,9 @@
 
 	<string name="app_name">Screen Filter</string>
 
-	<string name="action_about">Hakkında</string>
-	<string name="action_dark_theme">Karanlık Tema</string>
+    <string name="action_dark_theme">Karanlık Tema</string>
 
-	<string name="dialog_overlay_enable_title">Durum çubuğunu kaplamayı aç.</string>
-	<string name="dialog_overlay_enable_message">Ekranın üstünde bir maske oluşturur, bazı cihazlarda izinler gerektirebilir. (örn: MIUI ve Android 6.0)\nEğer ilk denemede çalışmazsa, bu uygulamanın sistem uyarı pencerelerini göstermesi için gerekli olan uygulama izinlerini verin.</string>
-
-	<string name="mask_fail_to_start">Maske başlatılamadı.Ayarlarınızdan uygulamanın izinlerini kontrol edin.</string>
+    <string name="mask_fail_to_start">Maske başlatılamadı.Ayarlarınızdan uygulamanın izinlerini kontrol edin.</string>
 
 	<string name="dialog_first_run_title">İlk kurulum</string>
 	<string name="dialog_first_run_message">Bu mesajı görüyormusun? Eğer görüyorsan; Screen Filter sorunsuz çalışıyor demektir.\n OK.\'a tıklamazsan,5 saniye sonra otomatik olarak kapanacak.</string>
