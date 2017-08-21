@@ -156,11 +156,6 @@ public class MaskService extends Service {
 
     private void destroyMaskView() {
         isShowing = false;
-        try {
-            Utility.createStatusBarTiles(this, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         cancelNotification();
         if (mLayout != null) {
             mLayout.animate()
@@ -281,20 +276,14 @@ public class MaskService extends Service {
             switch (action) {
                 case Constants.ACTION_START:
                     Log.i(TAG, "Start Mask");
-                    if (mLayout == null) {
-                        createMaskView();
-                    }
+                    if (mLayout == null) createMaskView();
 
                     createNotification();
                     startForeground(NOTIFICATION_NO, mNoti);
-                    try {
-                        updateLayoutParams(mode, brightness);
-                        mWindowManager.updateViewLayout(mLayout, mLayoutParams);
-                        Utility.createStatusBarTiles(this, true);
-                    } catch (Exception e) {
-                        // do nothing....
-                        e.printStackTrace();
-                    }
+
+                    updateLayoutParams(mode, brightness);
+                    mWindowManager.updateViewLayout(mLayout, mLayoutParams);
+
                     isShowing = true;
                     Log.i(TAG, "Set alpha:" + String.valueOf(100 - intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0)));
                     break;
