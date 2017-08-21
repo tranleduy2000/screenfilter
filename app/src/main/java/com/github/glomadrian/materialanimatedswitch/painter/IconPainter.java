@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import info.papdt.blackblub.R;
+import com.duy.screenfilter.R;
 
 /**
  * @author Adrián García Lomas

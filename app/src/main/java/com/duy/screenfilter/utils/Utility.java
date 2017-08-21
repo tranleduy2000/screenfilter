@@ -11,11 +11,14 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.duy.screenfilter.Constants;
+import com.duy.screenfilter.C;
 
 import java.util.Calendar;
 
+@SuppressWarnings("unchecked")
 public class Utility {
+
+    public static final int CM_TILE_CODE = 1001;
 
     public static final int REQUEST_ALARM_SUNRISE = 1002, REQUEST_ALARM_SUNSET = 1003;
 
@@ -25,14 +28,37 @@ public class Utility {
         Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         DisplayMetrics dm = new DisplayMetrics();
         display.getRealMetrics(dm);
-        return dm.heightPixels;
+        int dpi = dm.heightPixels;
+
+        return dpi;
     }
 
     public static int getTrueScreenWidth(Context context) {
         Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         DisplayMetrics dm = new DisplayMetrics();
         display.getRealMetrics(dm);
-        return dm.widthPixels;
+        int dpi = dm.widthPixels;
+
+        return dpi;
+    }
+
+    /**
+     * Create a tiles on the status bar through CyanogenMod SDK -- Fung Jichun
+     * You can learn more from: https://cyngn.com/developer-blog/introducing-the-cyanogen-platform-sdk
+     */
+    public static void createStatusBarTiles(Context context, boolean nowStatus) {
+//		Intent intent = new Intent();
+//		intent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+//		intent.putExtra(C.EXTRA_ACTION, nowStatus ? C.ACTION_STOP : C.ACTION_START);
+//
+//		CustomTile customTile = new CustomTile.Builder(context)
+//				.shouldCollapsePanel(false)
+//				.setLabel(nowStatus ? R.string.notification_action_turn_off : R.string.app_name)
+//				.setIcon(nowStatus ? R.drawable.ic_brightness_2_white_36dp : R.drawable.ic_wb_sunny_white_36dp)
+//				.setOnClickIntent(PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+//				.build();
+//
+//		CMStatusBarManager.getInstance(context).publishTile(CM_TILE_CODE, customTile);
     }
 
     public static void updateAlarmSettings(Context context) {
@@ -61,24 +87,24 @@ public class Utility {
 
             Log.i(TAG, "Reset alarm");
 
-            cancelAlarm(context, REQUEST_ALARM_SUNRISE, Constants.ALARM_ACTION_STOP);
-            cancelAlarm(context, REQUEST_ALARM_SUNSET, Constants.ALARM_ACTION_START);
+            cancelAlarm(context, REQUEST_ALARM_SUNRISE, C.ALARM_ACTION_STOP);
+            cancelAlarm(context, REQUEST_ALARM_SUNSET, C.ALARM_ACTION_START);
             setAlarm(context,
                     AlarmManager.RTC_WAKEUP,
                     sunriseCalendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY,
                     REQUEST_ALARM_SUNRISE,
-                    Constants.ALARM_ACTION_STOP);
+                    C.ALARM_ACTION_STOP);
             setAlarm(context,
                     AlarmManager.RTC_WAKEUP,
                     sunsetCalendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY,
                     REQUEST_ALARM_SUNSET,
-                    Constants.ALARM_ACTION_START);
+                    C.ALARM_ACTION_START);
         } else {
             Log.i(TAG, "Cancel alarm");
-            cancelAlarm(context, REQUEST_ALARM_SUNRISE, Constants.ALARM_ACTION_STOP);
-            cancelAlarm(context, REQUEST_ALARM_SUNSET, Constants.ALARM_ACTION_START);
+            cancelAlarm(context, REQUEST_ALARM_SUNRISE, C.ALARM_ACTION_STOP);
+            cancelAlarm(context, REQUEST_ALARM_SUNSET, C.ALARM_ACTION_START);
         }
     }
 

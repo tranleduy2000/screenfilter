@@ -18,17 +18,16 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 
-import com.duy.screenfilter.Constants;
+import com.duy.screenfilter.C;
+import com.duy.screenfilter.R;
+import com.duy.screenfilter.receiver.TileReceiver;
 import com.duy.screenfilter.ui.LaunchActivity;
 import com.duy.screenfilter.utils.Utility;
-
-import info.papdt.blackblub.R;
 
 import static android.view.WindowManager.LayoutParams;
 
 public class MaskService extends Service {
 
-    public static final String ACTION_UPDATE_STATUS = "info.papdt.blackbulb.ACTION_UPDATE_STATUS";
     private static final int ANIMATE_DURATION_MILES = 250;
     private static final int NOTIFICATION_NO = 1024;
     private static final String TAG = MaskService.class.getSimpleName();
@@ -39,7 +38,7 @@ public class MaskService extends Service {
     private Notification mNoti;
     private View mLayout;
     private LayoutParams mLayoutParams;
-    private int mode = Constants.MODE_NO_PERMISSION;
+    private int mode = C.MODE_NO_PERMISSION;
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
 
@@ -58,7 +57,7 @@ public class MaskService extends Service {
         destroyMaskView();
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(LaunchActivity.class.getCanonicalName());
-        broadcastIntent.putExtra(Constants.EXTRA_EVENT_ID, Constants.EVENT_DESTORY_SERVICE);
+        broadcastIntent.putExtra(C.EXTRA_EVENT_ID, C.EVENT_DESTORY_SERVICE);
         sendBroadcast(broadcastIntent);
     }
 
@@ -86,7 +85,7 @@ public class MaskService extends Service {
             e.printStackTrace();
             Intent broadcastIntent = new Intent();
             broadcastIntent.setAction(LaunchActivity.class.getCanonicalName());
-            broadcastIntent.putExtra(Constants.EXTRA_EVENT_ID, Constants.EVENT_CANNOT_START);
+            broadcastIntent.putExtra(C.EXTRA_EVENT_ID, C.EVENT_CANNOT_START);
             sendBroadcast(broadcastIntent);
         }
     }
@@ -99,18 +98,18 @@ public class MaskService extends Service {
         this.mAccessibilityManager.isEnabled();
 
         switch (mode) {
-            case Constants.MODE_NO_PERMISSION:
+            case C.MODE_NO_PERMISSION:
                 mLayoutParams.type = LayoutParams.TYPE_TOAST;
                 break;
-            case Constants.MODE_NORMAL:
-            case Constants.MODE_EYES_CARE:
+            case C.MODE_NORMAL:
+            case C.MODE_EYES_CARE:
                 mLayoutParams.type = LayoutParams.TYPE_SYSTEM_OVERLAY;
                 break;
-            case Constants.MODE_OVERLAY_ALL:
+            case C.MODE_OVERLAY_ALL:
                 mLayoutParams.type = LayoutParams.TYPE_SYSTEM_ERROR;
                 break;
         }
-        if (mode == Constants.MODE_OVERLAY_ALL) {
+        if (mode == C.MODE_OVERLAY_ALL) {
             mLayoutParams.width = 0;
             mLayoutParams.height = 0;
             mLayoutParams.flags |= LayoutParams.FLAG_DIM_BEHIND;
@@ -142,7 +141,7 @@ public class MaskService extends Service {
         }
 
         if (mLayout != null) {
-            mLayout.setBackgroundColor(mode == Constants.MODE_EYES_CARE ? Color.argb(220, 200, 100, 0) : Color.BLACK);
+            mLayout.setBackgroundColor(mode == C.MODE_EYES_CARE ? Color.argb(220, 200, 100, 0) : Color.BLACK);
         }
     }
 
@@ -158,6 +157,11 @@ public class MaskService extends Service {
 
     private void destroyMaskView() {
         isShowing = false;
+        try {
+            Utility.createStatusBarTiles(this, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         cancelNotification();
         if (mLayout != null) {
             mLayout.animate()
@@ -196,10 +200,10 @@ public class MaskService extends Service {
         Log.i(TAG, "Create running notification");
         Intent openIntent = new Intent(this, LaunchActivity.class);
         Intent pauseIntent = new Intent();
-        pauseIntent.setAction(ACTION_UPDATE_STATUS);
-        Log.i(TAG, "Create " + Constants.ACTION_PAUSE + " action");
-        pauseIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
-        pauseIntent.putExtra(Constants.EXTRA_BRIGHTNESS, brightness);
+        pauseIntent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+        Log.i(TAG, "Create " + C.ACTION_PAUSE + " action");
+        pauseIntent.putExtra(C.EXTRA_ACTION, C.ACTION_PAUSE);
+        pauseIntent.putExtra(C.EXTRA_BRIGHTNESS, brightness);
 
         Notification.Action pauseAction = new Notification.Action(
                 R.drawable.ic_wb_incandescent_black_24dp,
@@ -226,12 +230,12 @@ public class MaskService extends Service {
         Log.i(TAG, "Create paused notification");
         Intent openIntent = new Intent(this, LaunchActivity.class);
         Intent resumeIntent = new Intent();
-        resumeIntent.setAction(ACTION_UPDATE_STATUS);
-        resumeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
-        resumeIntent.putExtra(Constants.EXTRA_BRIGHTNESS, brightness);
+        resumeIntent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+        resumeIntent.putExtra(C.EXTRA_ACTION, C.ACTION_START);
+        resumeIntent.putExtra(C.EXTRA_BRIGHTNESS, brightness);
 
         Intent closeIntent = new Intent(this, MaskService.class);
-        closeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
+        closeIntent.putExtra(C.EXTRA_ACTION, C.ACTION_STOP);
 
         Notification.Action resumeAction = new Notification.Action(R.drawable.ic_wb_incandescent_black_24dp,
                 getString(R.string.notification_action_turn_on),
@@ -268,25 +272,32 @@ public class MaskService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int arg) {
-        if (intent != null && intent.hasExtra(Constants.EXTRA_ACTION)) {
-            String action = intent.getStringExtra(Constants.EXTRA_ACTION);
-            brightness = intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0);
-            mode = intent.getIntExtra(Constants.EXTRA_MODE, mode);
+        if (intent != null && intent.hasExtra(C.EXTRA_ACTION)) {
+            String action = intent.getStringExtra(C.EXTRA_ACTION);
+            brightness = intent.getIntExtra(C.EXTRA_BRIGHTNESS, 0);
+            mode = intent.getIntExtra(C.EXTRA_MODE, mode);
 
             switch (action) {
-                case Constants.ACTION_START:
+                case C.ACTION_START:
                     Log.i(TAG, "Start Mask");
-                    if (mLayout == null) createMaskView();
+                    if (mLayout == null) {
+                        createMaskView();
+                    }
 
                     createNotification();
                     startForeground(NOTIFICATION_NO, mNoti);
-                    updateLayoutParams(mode, brightness);
-                    mWindowManager.updateViewLayout(mLayout, mLayoutParams);
-
+                    try {
+                        updateLayoutParams(mode, brightness);
+                        mWindowManager.updateViewLayout(mLayout, mLayoutParams);
+                        Utility.createStatusBarTiles(this, true);
+                    } catch (Exception e) {
+                        // do nothing....
+                        e.printStackTrace();
+                    }
                     isShowing = true;
-                    Log.i(TAG, "Set alpha:" + String.valueOf(100 - intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0)));
+                    Log.i(TAG, "Set alpha:" + String.valueOf(100 - intent.getIntExtra(C.EXTRA_BRIGHTNESS, 0)));
                     break;
-                case Constants.ACTION_PAUSE:
+                case C.ACTION_PAUSE:
                     Log.i(TAG, "Pause Mask");
                     stopForeground(true);
                     destroyMaskView();
@@ -294,12 +305,12 @@ public class MaskService extends Service {
                     showPausedNotification();
                     isShowing = false;
                     break;
-                case Constants.ACTION_STOP:
+                case C.ACTION_STOP:
                     Log.i(TAG, "Stop Mask");
                     isShowing = false;
                     stopSelf();
                     break;
-                case Constants.ACTION_UPDATE:
+                case C.ACTION_UPDATE:
                     mAccessibilityManager.isEnabled();
                     Log.i(TAG, "Update Mask");
                     isShowing = true;
@@ -309,21 +320,21 @@ public class MaskService extends Service {
                     } catch (Exception e) {
                         // do nothing....
                     }
-                    Log.i(TAG, "Set alpha:" + String.valueOf(100 - intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0)));
+                    Log.i(TAG, "Set alpha:" + String.valueOf(100 - intent.getIntExtra(C.EXTRA_BRIGHTNESS, 0)));
                     break;
             }
 
         }
 
-        if (intent != null && !intent.getBooleanExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, false)) {
-            Log.i(TAG, "Check Mask. Check from toggle:" + intent.getBooleanExtra(Constants.EXTRA_CHECK_FROM_TOGGLE, false));
+        if (intent != null && !intent.getBooleanExtra(C.EXTRA_DO_NOT_SEND_CHECK, false)) {
+            Log.i(TAG, "Check Mask. Check from toggle:" + intent.getBooleanExtra(C.EXTRA_CHECK_FROM_TOGGLE, false));
             Intent broadcastIntent = new Intent();
             broadcastIntent.setAction(
-                    intent.getBooleanExtra(Constants.EXTRA_CHECK_FROM_TOGGLE, false)
+                    intent.getBooleanExtra(C.EXTRA_CHECK_FROM_TOGGLE, false)
                             ? "info.papdt.blackbulb.ACTION_TOGGLE"
                             : "info.papdt.blackbulb.ACTION_UPDATE_ACTIVITY_TOGGLE"
             );
-            broadcastIntent.putExtra(Constants.EXTRA_EVENT_ID, Constants.EVENT_CHECK);
+            broadcastIntent.putExtra(C.EXTRA_EVENT_ID, C.EVENT_CHECK);
             broadcastIntent.putExtra("isShowing", isShowing);
             sendBroadcast(broadcastIntent);
         }

@@ -11,14 +11,13 @@ import android.widget.FrameLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.duy.screenfilter.R;
 import com.duy.screenfilter.utils.NightScreenSettings;
 import com.duy.screenfilter.utils.Utility;
 import com.github.florent37.diagonallayout.DiagonalLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Locale;
-
-import info.papdt.blackblub.R;
 
 public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnTimeSetListener {
 

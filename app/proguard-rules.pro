@@ -43,9 +43,9 @@
     public static <fields>;
 }
 
--keep class info.papdt.blackblub.receiver.** {*;}
--keep class info.papdt.blackblub.services.** {*;}
--keep class info.papdt.blackblub.ui.** {*;}
--keep class info.papdt.blackblub.ui.LaunchActivity$MessageReceiver {*;}
--keep class info.papdt.blackblub.ui.shortcut.ToggleActivity$MessageReceiver {*;}
+-keep class com.duy.screenfilter.receiver.** {*;}
+-keep class com.duy.screenfilter.services.** {*;}
+-keep class com.duy.screenfilter.ui.** {*;}
+-keep class com.duy.screenfilter.ui.LaunchActivity$MessageReceiver {*;}
+-keep class com.duy.screenfilter.ui.shortcut.ToggleActivity$MessageReceiver {*;}
 -keep class com.wdullaer.** {*;}

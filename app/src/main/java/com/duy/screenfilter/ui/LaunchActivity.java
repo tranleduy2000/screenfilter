@@ -1,5 +1,6 @@
 package com.duy.screenfilter.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -24,23 +25,25 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.duy.screenfilter.Constants;
+import com.duy.screenfilter.C;
+import com.duy.screenfilter.R;
+import com.duy.screenfilter.receiver.TileReceiver;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.ui.adapter.ModeListAdapter;
 import com.duy.screenfilter.utils.NightScreenSettings;
+import com.duy.screenfilter.utils.Utility;
 import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
-
-import info.papdt.blackblub.R;
-
-import static com.duy.screenfilter.services.MaskService.ACTION_UPDATE_STATUS;
 
 public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
     private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
     private static MaterialAnimatedSwitch mSwitch;
-    private static final Handler mHandler = new Handler() {
+    private static boolean isRunning = false, hasDismissFirstRunDialog = false;
+    @SuppressLint("HandlerLeak")
+    private static Handler mHandler = new Handler() {
+
         @Override
         public void handleMessage(Message msg) {
             if (msg.what < 10) {
@@ -53,8 +56,6 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         }
 
     };
-    private static boolean isRunning = false;
-    private static boolean hasDismissFirstRunDialog = false;
     private DiscreteSeekBar mSeekbar;
     private TextView mModeText;
     private ImageButton mSchedulerBtn;
@@ -63,24 +64,32 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
     private int targetMode;
     private NightScreenSettings mNightScreenSettings;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         mNightScreenSettings = NightScreenSettings.getInstance(getApplicationContext());
 
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        // Don't worry too much. Min SDK is 21.
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setNavigationBarColor(Color.TRANSPARENT);
 
         if (mNightScreenSettings.getBoolean(NightScreenSettings.KEY_DARK_THEME, false)) {
             setTheme(R.style.AppTheme_Dark);
         }
+
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
 
         Intent i = new Intent(this, MaskService.class);
         startService(i);
+
+        // Publish CM Tiles
+        try {
+            Utility.createStatusBarTiles(this, isRunning);
+        } catch (Exception e) {
+
+        }
 
         mSwitch = findViewById(R.id.toggle);
         mSwitch.setOnCheckedChangeListener(new MaterialAnimatedSwitch.OnCheckedChangeListener() {
@@ -88,9 +97,9 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
             public void onCheckedChanged(boolean b) {
                 if (b) {
                     Intent intent = new Intent();
-                    intent.setAction(ACTION_UPDATE_STATUS);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
-                    intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
+                    intent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+                    intent.putExtra(C.EXTRA_ACTION, C.ACTION_START);
+                    intent.putExtra(C.EXTRA_DO_NOT_SEND_CHECK, true);
                     sendBroadcast(intent);
                     isRunning = true;
 
@@ -118,7 +127,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                                         mSwitch.toggle();
                                         if (mNightScreenSettings.getBoolean(NightScreenSettings.KEY_FIRST_RUN, true)) {
                                             Intent intent = new Intent(LaunchActivity.this, MaskService.class);
-                                            intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
+                                            intent.putExtra(C.EXTRA_ACTION, C.ACTION_STOP);
                                             stopService(intent);
                                             isRunning = false;
                                         }
@@ -136,8 +145,8 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                     }
                 } else {
                     Intent intent = new Intent(LaunchActivity.this, MaskService.class);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
-                    intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
+                    intent.putExtra(C.EXTRA_ACTION, C.ACTION_STOP);
+                    intent.putExtra(C.EXTRA_DO_NOT_SEND_CHECK, true);
                     stopService(intent);
                     isRunning = false;
                 }
@@ -154,9 +163,9 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                 v = value;
                 if (isRunning) {
                     Intent intent = new Intent(LaunchActivity.this, MaskService.class);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
-                    intent.putExtra(Constants.EXTRA_BRIGHTNESS, mSeekbar.getProgress());
-                    intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
+                    intent.putExtra(C.EXTRA_ACTION, C.ACTION_UPDATE);
+                    intent.putExtra(C.EXTRA_BRIGHTNESS, mSeekbar.getProgress());
+                    intent.putExtra(C.EXTRA_DO_NOT_SEND_CHECK, true);
                     startService(intent);
                 }
             }
@@ -175,16 +184,15 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         });
 
         mModeText = findViewById(R.id.mode_view);
-        int mode = mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, Constants.MODE_NO_PERMISSION);
-        String msg = getResources().getStringArray(R.array.mode_text)[mode]
-                + ((mode == Constants.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        int mode = mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, C.MODE_NO_PERMISSION);
+        mModeText.setText(getResources().getStringArray(R.array.mode_text)[mode]
+                + ((mode == C.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 ? " " + getString(R.string.mode_text_no_permission_warning)
-                : "");
-        mModeText.setText(msg);
+                : ""));
         findViewById(R.id.mode_view_container).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int current = mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, Constants.MODE_NO_PERMISSION);
+                int current = mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, C.MODE_NO_PERMISSION);
                 mModeDialog = new AlertDialog.Builder(LaunchActivity.this)
                         .setTitle(R.string.dialog_choose_mode)
                         .setSingleChoiceItems(
@@ -340,8 +348,9 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void applyNewMode(int targetMode) {
-        if (isRunning && targetMode != mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, Constants.MODE_NO_PERMISSION)) {
+        if (isRunning && targetMode != mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, C.MODE_NO_PERMISSION)) {
             mSwitch.toggle();
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -352,7 +361,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         }
         mNightScreenSettings.putInt(NightScreenSettings.KEY_MODE, targetMode);
         mModeText.setText(getResources().getStringArray(R.array.mode_text)[targetMode]
-                + ((targetMode == Constants.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                + ((targetMode == C.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 ? " " + getString(R.string.mode_text_no_permission_warning)
                 : ""));
     }
@@ -375,9 +384,9 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         @Override
         public void onReceive(Context context, Intent intent) {
             if (mSwitch == null) return;
-            int eventId = intent.getIntExtra(Constants.EXTRA_EVENT_ID, -1);
+            int eventId = intent.getIntExtra(C.EXTRA_EVENT_ID, -1);
             switch (eventId) {
-                case Constants.EVENT_CANNOT_START:
+                case C.EVENT_CANNOT_START:
                     // Receive a error from MaskService
                     isRunning = false;
                     try {
@@ -391,13 +400,13 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
 
                     }
                     break;
-                case Constants.EVENT_DESTORY_SERVICE:
+                case C.EVENT_DESTORY_SERVICE:
                     if (isRunning) {
                         mSwitch.toggle();
                         isRunning = false;
                     }
                     break;
-                case Constants.EVENT_CHECK:
+                case C.EVENT_CHECK:
                     Log.i("C", "Checked" + intent.getBooleanExtra("isShowing", false));
                     if (isRunning = intent.getBooleanExtra("isShowing", false) != mSwitch.isChecked()) {
                         // If I don't use postDelayed, Switch may cause a NPE because its animator wasn't initialized.

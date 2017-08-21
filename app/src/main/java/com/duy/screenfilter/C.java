@@ -1,6 +1,6 @@
 package com.duy.screenfilter;
 
-public class Constants {
+public class C {
 
     /**
      * Service

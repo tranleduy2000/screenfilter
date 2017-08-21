@@ -11,7 +11,7 @@
 		android:shortcutLongLabel="@string/shortcut_label_switch">
 		<intent
 			android:action="android.intent.action.VIEW"
-			android:targetPackage="info.papdt.blackblub"
+			android:targetPackage="com.duy.screenfilter"
 			android:targetClass="com.duy.screenfilter.ui.shortcut.ToggleActivity" />
 		<categories android:name="android.shortcut.conversation" />
 	</shortcut>

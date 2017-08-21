@@ -1,14 +1,16 @@
 package com.duy.screenfilter.ui.shortcut;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-import com.duy.screenfilter.Constants;
+import com.duy.screenfilter.C;
+import com.duy.screenfilter.R;
+import com.duy.screenfilter.receiver.TileReceiver;
 import com.duy.screenfilter.services.MaskService;
-
-import info.papdt.blackblub.R;
 
 public class ToggleActivity extends Activity {
 
@@ -32,11 +34,29 @@ public class ToggleActivity extends Activity {
             finish();
         } else {
             Intent i = new Intent(this, MaskService.class);
-            i.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_CHECK);
-            i.putExtra(Constants.EXTRA_CHECK_FROM_TOGGLE, true);
+            i.putExtra(C.EXTRA_ACTION, C.ACTION_CHECK);
+            i.putExtra(C.EXTRA_CHECK_FROM_TOGGLE, true);
             startService(i);
             finish();
         }
 
     }
+
+    public static class MessageReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int eventId = intent.getIntExtra(C.EXTRA_EVENT_ID, -1);
+            switch (eventId) {
+                case C.EVENT_CHECK:
+                    Intent i = new Intent();
+                    i.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+                    i.putExtra(C.EXTRA_ACTION, intent.getBooleanExtra("isShowing", false) ? C.ACTION_STOP : C.ACTION_START);
+                    context.sendBroadcast(i);
+                    break;
+            }
+        }
+
+    }
+
 }

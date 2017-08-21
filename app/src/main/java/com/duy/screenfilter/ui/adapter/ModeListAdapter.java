@@ -9,10 +9,10 @@ import android.widget.ListAdapter;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
+import com.duy.screenfilter.R;
+
 import java.util.Arrays;
 import java.util.List;
-
-import info.papdt.blackblub.R;
 
 public class ModeListAdapter extends BaseAdapter implements ListAdapter {
 

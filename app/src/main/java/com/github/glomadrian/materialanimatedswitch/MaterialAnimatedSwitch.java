@@ -22,7 +22,7 @@ import com.github.glomadrian.materialanimatedswitch.painter.IconReleasePainter;
 import java.util.Observable;
 import java.util.Observer;
 
-import info.papdt.blackblub.R;
+import com.duy.screenfilter.R;
 
 /**
  * @author Adrián García Lomas

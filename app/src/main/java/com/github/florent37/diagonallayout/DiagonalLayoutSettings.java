@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 
-import info.papdt.blackblub.R;
+import com.duy.screenfilter.R;
 
 public class DiagonalLayoutSettings {
     public final static int LEFT = 1;
