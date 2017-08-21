@@ -1,4 +1,4 @@
-package com.duy.screenfilter.ui;
+package com.duy.screenfilter.ui.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +18,7 @@ import com.duy.screenfilter.utils.AppSetting;
  * Created by Duy on 21-Aug-17.
  */
 
-class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> {
+public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> {
     @ColorInt
     private final int[] colors;
     private LayoutInflater inflater;
@@ -46,7 +46,6 @@ class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> {
                 setting.setFilterColor(colors[holder.getAdapterPosition()]);
                 Intent intent = new Intent(context, MaskService.class);
                 intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE_COLOR);
-                intent.putExtra(Constants.EXTRA_COLOR, colors);
                 context.startService(intent);
             }
         });

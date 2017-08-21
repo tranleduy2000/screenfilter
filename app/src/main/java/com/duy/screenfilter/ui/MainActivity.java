@@ -30,6 +30,7 @@ import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.services.TileReceiver;
+import com.duy.screenfilter.ui.adapter.ColorAdapter;
 import com.duy.screenfilter.ui.adapter.ModeListAdapter;
 import com.duy.screenfilter.utils.AppSetting;
 import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;

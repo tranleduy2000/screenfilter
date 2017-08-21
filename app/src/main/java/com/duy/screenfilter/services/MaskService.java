@@ -43,14 +43,14 @@ public class MaskService extends Service {
     private int mode = Constants.MODE_NO_PERMISSION;
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
-    private AppSetting mSettings;
+    private AppSetting mSetting;
     @ColorInt
     private int color = Color.BLACK;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mSettings = AppSetting.newInstance(this);
+        mSetting = AppSetting.newInstance(this);
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mAccessibilityManager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
@@ -73,7 +73,7 @@ public class MaskService extends Service {
     private void createMaskView() {
         mAccessibilityManager.isEnabled();
 
-        updateLayoutParams(mode, -1, color);
+        updateLayoutParams(mode, -1);
         mLayoutParams.gravity = Gravity.CENTER;
 
         if (mLayout == null) {
@@ -97,7 +97,7 @@ public class MaskService extends Service {
         }
     }
 
-    private void updateLayoutParams(int mode, int brightness, int color) {
+    private void updateLayoutParams(int mode, int brightness) {
         if (mLayoutParams == null) mLayoutParams = new LayoutParams();
 
         this.mAccessibilityManager.isEnabled();
@@ -147,6 +147,7 @@ public class MaskService extends Service {
 
         if (mLayout != null) {
             int targetAlpha = (int) ((100 - this.brightness) * 0.01f * 255);
+            int color = mSetting.getFilterColor();
             mLayout.setBackgroundColor(Color.argb(targetAlpha,
                     Color.red(color), Color.green(color), Color.blue(color)));
         }
@@ -325,7 +326,7 @@ public class MaskService extends Service {
         createNotification();
         startForeground(NOTIFICATION_NO, mNoti);
 
-        updateLayoutParams(mode, brightness, color);
+        updateLayoutParams(mode, brightness);
         mWindowManager.updateViewLayout(mLayout, mLayoutParams);
 
         isShowing = true;
@@ -352,7 +353,7 @@ public class MaskService extends Service {
 
         mAccessibilityManager.isEnabled();
         isShowing = true;
-        updateLayoutParams(mode, brightness, color);
+        updateLayoutParams(mode, brightness);
         mWindowManager.updateViewLayout(mLayout, mLayoutParams);
     }
 
