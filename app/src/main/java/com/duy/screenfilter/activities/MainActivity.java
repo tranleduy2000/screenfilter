@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
+import com.duy.screenfilter.BuildConfig;
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.adapter.ColorAdapter;
@@ -356,6 +357,14 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             menuItem.setChecked(!menuItem.isChecked());
             recreate();
             return true;
+        } else if (id == R.id.action_playstore) {
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID));
+                startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
