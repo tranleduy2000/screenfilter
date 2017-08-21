@@ -177,58 +177,51 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         });
 
         mModeText = findViewById(R.id.mode_view);
-        int mode = mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
+        int mode = mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NORMAL);
         String msg = getResources().getStringArray(R.array.mode_text)[mode]
-                + ((mode == Constants.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                + ((mode == Constants.MODE_NORMAL && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 ? " " + getString(R.string.mode_text_no_permission_warning)
                 : "");
         mModeText.setText(msg);
         findViewById(R.id.mode_view_container).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int current = mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
+                int current = mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NORMAL);
                 mModeDialog = new AlertDialog.Builder(MainActivity.this)
                         .setTitle(R.string.dialog_choose_mode)
                         .setSingleChoiceItems(
-                                new ModeListAdapter(current),
-                                current,
+                                new ModeListAdapter(current), current,
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        if (which == 0) {
-                                            ((ModeListAdapter) mModeDialog.getListView().getAdapter())
-                                                    .setCurrent(which);
-                                            applyNewMode(which);
-                                        } else {
-                                            // http://stackoverflow.com/questions/32061934/permission-from-manifest-doesnt-work-in-android-6/32065680#32065680
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                if (!Settings.canDrawOverlays(MainActivity.this)) {
-                                                    targetMode = which;
-                                                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                                            Uri.parse("package:" + getPackageName()));
-                                                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-                                                } else {
-                                                    applyNewMode(which);
-                                                }
-                                            } else {
+                                        // http://stackoverflow.com/questions/32061934/permission-from-manifest-doesnt-work-in-android-6/32065680#32065680
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                            if (!Settings.canDrawOverlays(MainActivity.this)) {
                                                 targetMode = which;
-                                                new AlertDialog.Builder(MainActivity.this)
-                                                        .setTitle(R.string.dialog_overlay_enable_title)
-                                                        .setMessage(R.string.dialog_overlay_enable_message)
-                                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                                applyNewMode(targetMode);
-                                                            }
-                                                        })
-                                                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                                // Do nothing....
-                                                            }
-                                                        })
-                                                        .show();
+                                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                                        Uri.parse("package:" + getPackageName()));
+                                                startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+                                            } else {
+                                                applyNewMode(which);
                                             }
+                                        } else {
+                                            targetMode = which;
+                                            new AlertDialog.Builder(MainActivity.this)
+                                                    .setTitle(R.string.dialog_overlay_enable_title)
+                                                    .setMessage(R.string.dialog_overlay_enable_message)
+                                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                                            applyNewMode(targetMode);
+                                                        }
+                                                    })
+                                                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                                            // Do nothing....
+                                                        }
+                                                    })
+                                                    .show();
                                         }
                                         mModeDialog.dismiss();
                                     }
@@ -357,7 +350,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
 
     private void applyNewMode(int targetMode) {
-        if (isRunning && targetMode != mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION)) {
+        if (isRunning && targetMode != mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NORMAL)) {
             mSwitch.toggle();
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -367,10 +360,11 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             }, 500);
         }
         mSetting.putInt(AppSetting.KEY_MODE, targetMode);
-        mModeText.setText(getResources().getStringArray(R.array.mode_text)[targetMode]
-                + ((targetMode == Constants.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        String msg = getResources().getStringArray(R.array.mode_text)[targetMode]
+                + ((targetMode == Constants.MODE_NORMAL && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 ? " " + getString(R.string.mode_text_no_permission_warning)
-                : ""));
+                : "");
+        mModeText.setText(msg);
     }
 
     @Override

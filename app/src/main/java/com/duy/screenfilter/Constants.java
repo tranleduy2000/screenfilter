@@ -34,13 +34,7 @@ public class Constants {
     public static final int EVENT_DESTORY_SERVICE = 2;
     public static final int EVENT_CHECK = 3;
 
-    /**
-     * Mode
-     */
-    public static final int MODE_NO_PERMISSION = 0;
-    public static final int MODE_NORMAL = 1;
-    public static final int MODE_OVERLAY_ALL = 2;
-    public static final int MODE_EYES_CARE = 3;
-    // PS: MODE_NO_PERMISSION is deprecated in Android 7.X
+    public static final int MODE_NORMAL = 0;
+    public static final int MODE_OVERLAY_ALL = 1;
 
 }

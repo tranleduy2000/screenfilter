@@ -3,71 +3,75 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="com.duy.screenfilter">
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="cyanogenmod.permission.PUBLISH_CUSTOM_TILE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <application
+        android:name=".BlackbulbApplication"
         android:allowBackup="true"
         android:fullBackupContent="@xml/full_backup_contents"
-        android:name=".BlackbulbApplication"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_circle"
         android:label="@string/app_name"
         android:persistent="true"
+        android:roundIcon="@mipmap/ic_launcher_circle"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Light"
         tools:ignore="ManifestResource,UnusedAttribute">
         <activity
             android:name=".activities.MainActivity"
-            android:finishOnTaskLaunch="true"
             android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
             android:launchMode="singleInstance"
             android:stateNotNeeded="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts"/>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts"/>
         </activity>
 
-        <activity android:name=".activities.ToggleActivity"
-                  android:label="@string/shortcut_label_switch"
-                  android:icon="@drawable/ic_shortcut_switch"
-                  android:launchMode="singleInstance"
-                  android:finishOnTaskLaunch="true"
-                  android:excludeFromRecents="true"
-                  android:theme="@style/AppTheme.Empty">
+        <activity
+            android:name=".activities.ToggleActivity"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:icon="@drawable/ic_shortcut_switch"
+            android:label="@string/shortcut_label_switch"
+            android:launchMode="singleInstance"
+            android:theme="@style/AppTheme.Empty">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.CREATE_SHORTCUT"/>
             </intent-filter>
         </activity>
 
-        <service android:name=".services.MaskService" android:process=":mask"/>
+        <service
+            android:name=".services.MaskService"/>
 
-        <receiver android:name=".services.TileReceiver"
-                  android:exported="false">
+        <receiver
+            android:name=".services.TileReceiver"
+            android:exported="false">
             <intent-filter>
-                <action android:name="info.papdt.blackbulb.ACTION_UPDATE_STATUS" />
-                <action android:name="info.papdt.blackbulb.ALARM_ACTION_START" />
-                <action android:name="info.papdt.blackbulb.ALARM_ACTION_STOP" />
+                <action android:name="info.papdt.blackbulb.ACTION_UPDATE_STATUS"/>
+                <action android:name="info.papdt.blackbulb.ALARM_ACTION_START"/>
+                <action android:name="info.papdt.blackbulb.ALARM_ACTION_STOP"/>
             </intent-filter>
         </receiver>
 
 
         <receiver android:name=".activities.MainActivity$MessageReceiver">
             <intent-filter>
-                <action android:name="info.papdt.blackbulb.ACTION_UPDATE_ACTIVITY_TOGGLE" />
+                <action android:name="info.papdt.blackbulb.ACTION_UPDATE_ACTIVITY_TOGGLE"/>
             </intent-filter>
         </receiver>
 
         <receiver android:name=".activities.ToggleActivity$MessageReceiver">
             <intent-filter>
-                <action android:name="info.papdt.blackbulb.ACTION_TOGGLE" />
+                <action android:name="info.papdt.blackbulb.ACTION_TOGGLE"/>
             </intent-filter>
         </receiver>
 

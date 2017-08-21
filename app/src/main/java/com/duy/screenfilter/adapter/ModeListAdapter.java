@@ -17,11 +17,8 @@ import java.util.List;
 public class ModeListAdapter extends BaseAdapter implements ListAdapter {
 
     private static final List<Pair<Integer, Integer>> MODES = Arrays.asList(
-            Pair.create(R.string.mode_text_no_permission, R.string.mode_desc_no_permission),
             Pair.create(R.string.mode_text_normal, R.string.mode_desc_normal),
-            Pair.create(R.string.mode_text_overlay_all, R.string.mode_desc_overlay_all),
-            Pair.create(R.string.mode_text_eyes_care, R.string.mode_desc_eyes_care)
-    );
+            Pair.create(R.string.mode_text_overlay_all, R.string.mode_desc_overlay_all));
     private int current;
 
     public ModeListAdapter(int current) {

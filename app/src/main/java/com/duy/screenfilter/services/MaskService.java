@@ -40,7 +40,7 @@ public class MaskService extends Service {
     private Notification mNoti;
     private View mLayout;
     private LayoutParams mLayoutParams;
-    private int mode = Constants.MODE_NO_PERMISSION;
+    private int mode = Constants.MODE_NORMAL;
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
     private AppSetting mSetting;
@@ -105,11 +105,7 @@ public class MaskService extends Service {
         this.mAccessibilityManager.isEnabled();
 
         switch (mode) {
-            case Constants.MODE_NO_PERMISSION:
-                mLayoutParams.type = LayoutParams.TYPE_TOAST;
-                break;
             case Constants.MODE_NORMAL:
-            case Constants.MODE_EYES_CARE:
                 mLayoutParams.type = LayoutParams.TYPE_SYSTEM_OVERLAY;
                 break;
             case Constants.MODE_OVERLAY_ALL:
