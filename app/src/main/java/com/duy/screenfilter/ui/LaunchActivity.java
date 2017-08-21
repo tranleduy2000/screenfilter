@@ -1,6 +1,5 @@
 package com.duy.screenfilter.ui;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -27,11 +26,10 @@ import android.widget.Toast;
 
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
-import com.duy.screenfilter.services.TileReceiver;
 import com.duy.screenfilter.services.MaskService;
+import com.duy.screenfilter.services.TileReceiver;
 import com.duy.screenfilter.ui.adapter.ModeListAdapter;
 import com.duy.screenfilter.utils.NightScreenSettings;
-import com.duy.screenfilter.utils.Utility;
 import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
@@ -40,9 +38,8 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
 
     private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
     private static MaterialAnimatedSwitch mSwitch;
-    private static boolean isRunning = false, hasDismissFirstRunDialog = false;
-    @SuppressLint("HandlerLeak")
-    private static Handler mHandler = new Handler() {
+
+    private static final Handler mHandler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
@@ -56,6 +53,8 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         }
 
     };
+    private static boolean isRunning = false;
+    private boolean hasDismissFirstRunDialog = false;
     private DiscreteSeekBar mSeekbar;
     private TextView mModeText;
     private ImageButton mSchedulerBtn;
@@ -64,33 +63,18 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
     private int targetMode;
     private NightScreenSettings mNightScreenSettings;
 
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mNightScreenSettings = NightScreenSettings.getInstance(getApplicationContext());
-
-        // Don't worry too much. Min SDK is 21.
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().setNavigationBarColor(Color.TRANSPARENT);
-
+        mNightScreenSettings = NightScreenSettings.newInstance(getApplicationContext());
+        initWindow();
         if (mNightScreenSettings.getBoolean(NightScreenSettings.KEY_DARK_THEME, false)) {
             setTheme(R.style.AppTheme_Dark);
         }
-
         setContentView(R.layout.activity_setting);
 
         Intent i = new Intent(this, MaskService.class);
         startService(i);
-
-        // Publish CM Tiles
-        try {
-            Utility.createStatusBarTiles(this, isRunning);
-        } catch (Exception e) {
-
-        }
 
         mSwitch = findViewById(R.id.toggle);
         mSwitch.setOnCheckedChangeListener(new MaterialAnimatedSwitch.OnCheckedChangeListener() {
@@ -313,6 +297,14 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         });
     }
 
+    private void initWindow() {
+        // Don't worry too much. Min SDK is 21.
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
+
+    }
+
     private void showSchedulerDialog() {
         new SchedulerDialog(this, new DialogInterface.OnDismissListener() {
             @Override
@@ -349,7 +341,7 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
         }
     }
 
-    @SuppressLint("SetTextI18n")
+
     private void applyNewMode(int targetMode) {
         if (isRunning && targetMode != mNightScreenSettings.getInt(NightScreenSettings.KEY_MODE, Constants.MODE_NO_PERMISSION)) {
             mSwitch.toggle();
@@ -390,16 +382,8 @@ public class LaunchActivity extends Activity implements PopupMenu.OnMenuItemClic
                 case Constants.EVENT_CANNOT_START:
                     // Receive a error from MaskService
                     isRunning = false;
-                    try {
-                        mSwitch.toggle();
-                        Toast.makeText(
-                                context.getApplicationContext(),
-                                R.string.mask_fail_to_start,
-                                Toast.LENGTH_LONG
-                        ).show();
-                    } finally {
-
-                    }
+                    mSwitch.toggle();
+                    Toast.makeText(context, R.string.mask_fail_to_start, Toast.LENGTH_LONG).show();
                     break;
                 case Constants.EVENT_DESTORY_SERVICE:
                     if (isRunning) {

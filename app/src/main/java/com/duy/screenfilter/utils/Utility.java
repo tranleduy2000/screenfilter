@@ -44,7 +44,7 @@ public class Utility {
 
 
     public static void updateAlarmSettings(Context context) {
-        NightScreenSettings settings = NightScreenSettings.getInstance(context);
+        NightScreenSettings settings = NightScreenSettings.newInstance(context);
         if (settings.getBoolean(NightScreenSettings.KEY_AUTO_MODE, false)) {
             int hrsSunrise = settings.getInt(NightScreenSettings.KEY_HOURS_SUNRISE, 6);
             int minSunrise = settings.getInt(NightScreenSettings.KEY_MINUTES_SUNRISE, 0);

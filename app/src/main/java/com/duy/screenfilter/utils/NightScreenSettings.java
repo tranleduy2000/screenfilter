@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.duy.screenfilter.R;
+
 @SuppressLint("CommitPrefEdits")
 public class NightScreenSettings {
 
@@ -15,27 +17,21 @@ public class NightScreenSettings {
             KEY_HOURS_SUNRISE = "hrs_sunrise", KEY_MINUTES_SUNRISE = "min_sunrise",
             KEY_HOURS_SUNSET = "hrs_sunset", KEY_MINUTES_SUNSET = "min_sunset";
 
-    private volatile static NightScreenSettings sInstance;
 
     private SharedPreferences mPrefs;
+    private Context context;
 
     private NightScreenSettings(Context context) {
         mPrefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
+        this.context = context;
     }
 
-    public static NightScreenSettings getInstance(Context context) {
-        if (sInstance == null) {
-            synchronized (NightScreenSettings.class) {
-                if (sInstance == null) {
-                    sInstance = new NightScreenSettings(context);
-                }
-            }
-        }
-        return sInstance;
+    public static NightScreenSettings newInstance(Context context) {
+        return new NightScreenSettings(context);
     }
 
     public NightScreenSettings putBoolean(String key, boolean value) {
-        mPrefs.edit().putBoolean(key, value).commit();
+        mPrefs.edit().putBoolean(key, value).apply();
         return this;
     }
 
@@ -44,16 +40,21 @@ public class NightScreenSettings {
     }
 
     public NightScreenSettings putInt(String key, int value) {
-        mPrefs.edit().putInt(key, value).commit();
+        mPrefs.edit().putInt(key, value).apply();
         return this;
     }
 
     public int getInt(String key, int defValue) {
-        return mPrefs.getInt(key, defValue);
+        try {
+            return mPrefs.getInt(key, defValue);
+        } catch (Exception e) {
+            //class cast
+        }
+        return defValue;
     }
 
     public NightScreenSettings putString(String key, String value) {
-        mPrefs.edit().putString(key, value).commit();
+        mPrefs.edit().putString(key, value).apply();
         return this;
     }
 
@@ -61,4 +62,9 @@ public class NightScreenSettings {
         return mPrefs.getString(key, defValue);
     }
 
+
+    public int getFilterColor() {
+        return getInt(context.getString(R.string.key_pref_color),
+                context.getResources().getColor(R.color.grey_800));
+    }
 }

@@ -20,4 +20,21 @@
 
 	<color name="ripple_foreground_light">#6fffffff</color>
 
+	<color name="lime_700">#afb42b</color>
+	<color name="grey_800">#424242</color>
+	<color name="brown_500">#795548</color>
+	<color name="red_700">#d32f2f</color>
+	<color name="orange_500">#ff9800</color>
+	<color name="yellow_500">#ffeb3b</color>
+	<color name="green_700">#388e3c</color>
+
+	<integer-array name="filter_colors">
+		<item>@color/lime_700</item>
+		<item>@color/grey_800</item>
+		<item>@color/brown_500</item>
+		<item>@color/red_700</item>
+		<item>@color/orange_500</item>
+		<item>@color/yellow_500</item>
+		<item>@color/green_700</item>
+	</integer-array>
 </resources>
