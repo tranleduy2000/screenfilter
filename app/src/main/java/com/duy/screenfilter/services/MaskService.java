@@ -22,7 +22,6 @@ import android.view.accessibility.AccessibilityManager;
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.activities.MainActivity;
-import com.duy.screenfilter.utils.AppSetting;
 import com.duy.screenfilter.utils.Utility;
 
 import static android.view.WindowManager.LayoutParams;
@@ -43,14 +42,12 @@ public class MaskService extends Service {
     private int mode = Constants.MODE_NORMAL;
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
-    private AppSetting mSetting;
     @ColorInt
     private int color = Color.BLACK;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mSetting = AppSetting.getInstance(this);
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mAccessibilityManager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);

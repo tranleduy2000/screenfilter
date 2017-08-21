@@ -2,9 +2,7 @@
 
 	<dimen name="activity_horizontal_margin">16dp</dimen>
 
-	<dimen name="toolbar_height">48dp</dimen>
-
-	<dimen name="exitXAnimationStart">-15dp</dimen>
+    <dimen name="exitXAnimationStart">-15dp</dimen>
 	<dimen name="exitYAnimatorFinish">34dp</dimen>
 	<dimen name="enterYAnimationStart">-30dp</dimen>
 	<dimen name="enterAnimationStartValue">-25dp</dimen>
