@@ -1,0 +1,62 @@
+<resources>
+
+	<style name="BaseAppTheme.Light" parent="android:Theme.Material.Light.NoActionBar">
+		<item name="android:windowActionBar">false</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowBackground">@color/translucentBackgroundColor</item>
+		<item name="android:colorBackgroundCacheHint">@null</item>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+		<item name="card_background_color">#EEEEEE</item>
+		<item name="progress_bar_color">@color/teal_700</item>
+		<item name="icon_tint">@color/teal_500</item>
+		<item name="overflow_tint">#6f000000</item>
+	</style>
+
+	<style name="BaseAppTheme.Dark" parent="android:Theme.Material.NoActionBar">
+		<item name="android:windowActionBar">false</item>
+		<item name="android:windowNoTitle">true</item>
+		<item name="android:windowBackground">@color/translucentBackgroundColor</item>
+		<item name="android:colorBackgroundCacheHint">@null</item>
+		<item name="android:windowIsTranslucent">true</item>
+		<item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+		<item name="card_background_color">#212121</item>
+		<item name="progress_bar_color">#eeeeee</item>
+		<item name="icon_tint">#ffffff</item>
+		<item name="overflow_tint">#afffffff</item>
+	</style>
+
+	<style name="AppTheme.Light" parent="BaseAppTheme.Light">
+		<item name="android:windowDrawsSystemBarBackgrounds">true</item>
+		<item name="android:statusBarColor">@android:color/transparent</item>
+		<item name="android:navigationBarColor">@android:color/transparent</item>
+	</style>
+
+	<style name="AppTheme.Dark" parent="BaseAppTheme.Dark">
+		<item name="android:windowDrawsSystemBarBackgrounds">true</item>
+		<item name="android:statusBarColor">@android:color/transparent</item>
+		<item name="android:navigationBarColor">@android:color/transparent</item>
+	</style>
+
+	<style name="AppTheme.Empty" parent="@android:style/Theme.Translucent">
+		<item name="android:background">#00000000</item>
+		<item name="android:windowEnterAnimation">@null</item>
+		<item name="android:windowExitAnimation">@null</item>
+	</style>
+
+	<style name="Widget.DiscreteSeekBar" parent="android:Widget">
+		<item name="dsb_indicatorTextAppearance">@style/Widget.DiscreteIndicatorTextAppearance</item>
+		<item name="dsb_progressColor">@color/dsb_progress_color_list</item>
+		<item name="dsb_trackColor">@color/dsb_track_color_list</item>
+		<item name="dsb_rippleColor">@color/dsb_ripple_color_list</item>
+		<item name="dsb_indicatorColor">@color/dsb_progress_color</item>
+		<item name="dsb_indicatorElevation">4dp</item>
+		<item name="dsb_mirrorForRtl">true</item>
+	</style>
+
+	<style name="Widget.DiscreteIndicatorTextAppearance" parent="android:TextAppearance.Small">
+		<item name="android:textColor">?android:attr/textColorPrimaryInverse</item>
+		<item name="android:padding">6dp</item>
+	</style>
+
+</resources>

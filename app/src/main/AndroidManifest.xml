@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="info.papdt.blackblub">
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="cyanogenmod.permission.PUBLISH_CUSTOM_TILE"/>
+
+    <application
+        android:name="com.duy.screenfilter.BlackbulbApplication"
+        android:allowBackup="true"
+        android:fullBackupContent="@xml/full_backup_contents"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:persistent="true"
+        android:roundIcon="@mipmap/ic_launcher_circle"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme.Light"
+        tools:ignore="ManifestResource,UnusedAttribute">
+        <activity
+            android:name="com.duy.screenfilter.ui.LaunchActivity"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:stateNotNeeded="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts"/>
+        </activity>
+
+        <activity
+            android:name="com.duy.screenfilter.ui.shortcut.ToggleActivity"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:icon="@drawable/ic_shortcut_switch"
+            android:label="@string/shortcut_label_switch"
+            android:launchMode="singleInstance"
+            android:theme="@style/AppTheme.Empty">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.CREATE_SHORTCUT"/>
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="com.duy.screenfilter.services.MaskService"
+            android:process=":mask"/>
+
+
+        <receiver
+            android:name="com.duy.screenfilter.ui.LaunchActivity$MessageReceiver"
+            android:permission="true">
+            <intent-filter>
+                <action android:name="info.papdt.blackbulb.ACTION_UPDATE_ACTIVITY_TOGGLE"/>
+            </intent-filter>
+        </receiver>
+
+
+    </application>
+
+</manifest>
