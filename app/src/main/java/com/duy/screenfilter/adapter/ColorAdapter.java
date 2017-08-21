@@ -1,7 +1,6 @@
-package com.duy.screenfilter.ui.adapter;
+package com.duy.screenfilter.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -9,10 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
-import com.duy.screenfilter.services.MaskService;
-import com.duy.screenfilter.utils.AppSetting;
 
 /**
  * Created by Duy on 21-Aug-17.
@@ -22,14 +18,12 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> 
     @ColorInt
     private final int[] colors;
     private LayoutInflater inflater;
-    private AppSetting setting;
-    private Context context;
+    private OnColorClickListener listener;
 
-    public ColorAdapter(Context context) {
+    public ColorAdapter(Context context, OnColorClickListener listener) {
         this.colors = context.getResources().getIntArray(R.array.filter_colors);
         this.inflater = LayoutInflater.from(context);
-        this.setting = AppSetting.newInstance(context);
-        this.context = context;
+        this.listener = listener;
     }
 
     @Override
@@ -43,10 +37,7 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> 
         holder.color.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setting.setFilterColor(colors[holder.getAdapterPosition()]);
-                Intent intent = new Intent(context, MaskService.class);
-                intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE_COLOR);
-                context.startService(intent);
+                if (listener != null) listener.onColorClicked(colors[holder.getAdapterPosition()]);
             }
         });
     }
@@ -54,6 +45,10 @@ public class ColorAdapter extends RecyclerView.Adapter<ColorAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return colors.length;
+    }
+
+    public interface OnColorClickListener {
+        void onColorClicked(int color);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

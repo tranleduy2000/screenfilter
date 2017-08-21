@@ -16,7 +16,7 @@ public class TileReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        AppSetting settings = AppSetting.newInstance(context);
+        AppSetting settings = AppSetting.getInstance(context);
         Log.i(TAG, "received \"" + intent.getAction() + "\" action");
         if (ACTION_UPDATE_STATUS.equals(intent.getAction())) {
             String action = intent.getStringExtra(Constants.EXTRA_ACTION);

@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme.Light"
         tools:ignore="ManifestResource,UnusedAttribute">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".activities.MainActivity"
             android:finishOnTaskLaunch="true"
             android:excludeFromRecents="true"
             android:launchMode="singleInstance"
@@ -34,7 +34,7 @@
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts"/>
         </activity>
 
-        <activity android:name=".ui.shortcut.ToggleActivity"
+        <activity android:name=".activities.ToggleActivity"
                   android:label="@string/shortcut_label_switch"
                   android:icon="@drawable/ic_shortcut_switch"
                   android:launchMode="singleInstance"
@@ -59,13 +59,13 @@
         </receiver>
 
 
-        <receiver android:name=".ui.MainActivity$MessageReceiver">
+        <receiver android:name=".activities.MainActivity$MessageReceiver">
             <intent-filter>
                 <action android:name="info.papdt.blackbulb.ACTION_UPDATE_ACTIVITY_TOGGLE" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".ui.shortcut.ToggleActivity$MessageReceiver">
+        <receiver android:name=".activities.ToggleActivity$MessageReceiver">
             <intent-filter>
                 <action android:name="info.papdt.blackbulb.ACTION_TOGGLE" />
             </intent-filter>

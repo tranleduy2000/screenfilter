@@ -1,4 +1,4 @@
-package com.duy.screenfilter.ui.shortcut;
+package com.duy.screenfilter.activities;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;

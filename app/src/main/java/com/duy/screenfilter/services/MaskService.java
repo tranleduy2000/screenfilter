@@ -21,7 +21,7 @@ import android.view.accessibility.AccessibilityManager;
 
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
-import com.duy.screenfilter.ui.MainActivity;
+import com.duy.screenfilter.activities.MainActivity;
 import com.duy.screenfilter.utils.AppSetting;
 import com.duy.screenfilter.utils.Utility;
 
@@ -50,7 +50,7 @@ public class MaskService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mSetting = AppSetting.newInstance(this);
+        mSetting = AppSetting.getInstance(this);
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mAccessibilityManager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
@@ -73,7 +73,7 @@ public class MaskService extends Service {
     private void createMaskView() {
         mAccessibilityManager.isEnabled();
 
-        updateLayoutParams(mode, -1);
+        updateLayoutParams(mode, -1, color);
         mLayoutParams.gravity = Gravity.CENTER;
 
         if (mLayout == null) {
@@ -97,7 +97,9 @@ public class MaskService extends Service {
         }
     }
 
-    private void updateLayoutParams(int mode, int brightness) {
+    private void updateLayoutParams(int mode, int brightness, int color) {
+        Log.d(TAG, "updateLayoutParams() called with: mode = [" + mode + "], brightness = [" + brightness + "]");
+
         if (mLayoutParams == null) mLayoutParams = new LayoutParams();
 
         this.mAccessibilityManager.isEnabled();
@@ -147,7 +149,6 @@ public class MaskService extends Service {
 
         if (mLayout != null) {
             int targetAlpha = (int) ((100 - this.brightness) * 0.01f * 255);
-            int color = mSetting.getFilterColor();
             mLayout.setBackgroundColor(Color.argb(targetAlpha,
                     Color.red(color), Color.green(color), Color.blue(color)));
         }
@@ -288,9 +289,11 @@ public class MaskService extends Service {
                     this.stop(intent);
                     break;
                 case Constants.ACTION_UPDATE_BRIGHTNESS:
+                    Log.d(TAG, "onStartCommand: update brightness");
                     update(intent);
                     break;
                 case Constants.ACTION_UPDATE_COLOR:
+                    Log.d(TAG, "onStartCommand: update color");
                     update(intent);
                     break;
             }
@@ -326,10 +329,13 @@ public class MaskService extends Service {
         createNotification();
         startForeground(NOTIFICATION_NO, mNoti);
 
-        updateLayoutParams(mode, brightness);
-        mWindowManager.updateViewLayout(mLayout, mLayoutParams);
-
-        isShowing = true;
+        try {
+            updateLayoutParams(mode, brightness, color);
+            mWindowManager.updateViewLayout(mLayout, mLayoutParams);
+            isShowing = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Log.i(TAG, "Set alpha:" + String.valueOf(100 - intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0)));
     }
 
@@ -344,17 +350,16 @@ public class MaskService extends Service {
 
     private void update(Intent intent) {
         Log.i(TAG, "Update Mask");
-        if (intent.hasExtra(Constants.EXTRA_BRIGHTNESS)) {
-            brightness = intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0);
-        }
-        if (intent.hasExtra(Constants.EXTRA_COLOR)) {
-            color = intent.getIntExtra(Constants.EXTRA_COLOR, Color.BLACK);
-        }
-
+        brightness = intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, brightness);
+        color = intent.getIntExtra(Constants.EXTRA_COLOR, color);
         mAccessibilityManager.isEnabled();
-        isShowing = true;
-        updateLayoutParams(mode, brightness);
-        mWindowManager.updateViewLayout(mLayout, mLayoutParams);
+        try {
+            updateLayoutParams(mode, brightness, color);
+            mWindowManager.updateViewLayout(mLayout, mLayoutParams);
+            isShowing = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

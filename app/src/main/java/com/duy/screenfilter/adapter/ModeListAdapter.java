@@ -1,4 +1,4 @@
-package com.duy.screenfilter.ui.adapter;
+package com.duy.screenfilter.adapter;
 
 import android.util.Pair;
 import android.view.LayoutInflater;

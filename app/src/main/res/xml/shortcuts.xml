@@ -12,7 +12,7 @@
 		<intent
 			android:action="android.intent.action.VIEW"
 			android:targetPackage="com.duy.screenfilter"
-			android:targetClass="com.duy.screenfilter.ui.shortcut.ToggleActivity" />
+			android:targetClass="com.duy.screenfilter.activities.ToggleActivity" />
 		<categories android:name="android.shortcut.conversation" />
 	</shortcut>
 

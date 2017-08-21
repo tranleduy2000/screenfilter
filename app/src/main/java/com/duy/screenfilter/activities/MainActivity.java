@@ -1,4 +1,4 @@
-package com.duy.screenfilter.ui;
+package com.duy.screenfilter.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,20 +28,22 @@ import android.widget.Toast;
 
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
+import com.duy.screenfilter.adapter.ColorAdapter;
+import com.duy.screenfilter.adapter.ModeListAdapter;
 import com.duy.screenfilter.services.MaskService;
-import com.duy.screenfilter.services.TileReceiver;
-import com.duy.screenfilter.ui.adapter.ColorAdapter;
-import com.duy.screenfilter.ui.adapter.ModeListAdapter;
+import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
 import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
-public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
+import static com.duy.screenfilter.services.TileReceiver.ACTION_UPDATE_STATUS;
+
+public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener, ColorAdapter.OnColorClickListener {
 
     private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
+    public static boolean isRunning = false;
     private static MaterialAnimatedSwitch mSwitch;
-
     private static final Handler mHandler = new Handler() {
 
         @Override
@@ -56,7 +58,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         }
 
     };
-    private static boolean isRunning = false;
     private boolean hasDismissFirstRunDialog = false;
     private DiscreteSeekBar mSeekbar;
     private TextView mModeText;
@@ -64,17 +65,21 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     private PopupMenu popupMenu;
     private AlertDialog mAlertDialog, mModeDialog;
     private int targetMode;
-    private AppSetting mAppSetting;
+    private AppSetting mSetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAppSetting = AppSetting.newInstance(getApplicationContext());
+        mSetting = AppSetting.getInstance(getApplicationContext());
         initWindow();
-        if (mAppSetting.getBoolean(AppSetting.KEY_DARK_THEME, false)) {
+        if (mSetting.getBoolean(AppSetting.KEY_DARK_THEME, false)) {
             setTheme(R.style.AppTheme_Dark);
         }
         setContentView(R.layout.activity_setting);
+        bindView();
+    }
+
+    private void bindView() {
 
         Intent i = new Intent(this, MaskService.class);
         startService(i);
@@ -85,14 +90,14 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             public void onCheckedChanged(boolean b) {
                 if (b) {
                     Intent intent = new Intent();
-                    intent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+                    intent.setAction(ACTION_UPDATE_STATUS);
                     intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
                     intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
                     sendBroadcast(intent);
                     isRunning = true;
 
                     // For safe
-                    if (mAppSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
+                    if (mSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
                         if (mAlertDialog != null && mAlertDialog.isShowing()) {
                             return;
                         }
@@ -104,7 +109,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         hasDismissFirstRunDialog = true;
-                                        mAppSetting.putBoolean(AppSetting.KEY_FIRST_RUN, false);
+                                        mSetting.putBoolean(AppSetting.KEY_FIRST_RUN, false);
                                     }
                                 })
                                 .setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -113,7 +118,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                                         if (hasDismissFirstRunDialog) return;
                                         hasDismissFirstRunDialog = true;
                                         mSwitch.toggle();
-                                        if (mAppSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
+                                        if (mSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
                                             Intent intent = new Intent(MainActivity.this, MaskService.class);
                                             intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
                                             stopService(intent);
@@ -142,7 +147,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         });
 
         mSeekbar = findViewById(R.id.seek_bar);
-        mSeekbar.setProgress(mAppSetting.getInt(AppSetting.KEY_BRIGHTNESS, 50));
+        mSeekbar.setProgress(mSetting.getInt(AppSetting.KEY_BRIGHTNESS, 50));
         mSeekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             int v = -1;
 
@@ -166,21 +171,22 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             @Override
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
                 if (v != -1) {
-                    mAppSetting.putInt(AppSetting.KEY_BRIGHTNESS, v);
+                    mSetting.putInt(AppSetting.KEY_BRIGHTNESS, v);
                 }
             }
         });
 
         mModeText = findViewById(R.id.mode_view);
-        int mode = mAppSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
-        mModeText.setText(getResources().getStringArray(R.array.mode_text)[mode]
+        int mode = mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
+        String msg = getResources().getStringArray(R.array.mode_text)[mode]
                 + ((mode == Constants.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 ? " " + getString(R.string.mode_text_no_permission_warning)
-                : ""));
+                : "");
+        mModeText.setText(msg);
         findViewById(R.id.mode_view_container).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int current = mAppSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
+                int current = mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION);
                 mModeDialog = new AlertDialog.Builder(MainActivity.this)
                         .setTitle(R.string.dialog_choose_mode)
                         .setSingleChoiceItems(
@@ -238,7 +244,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         popupMenu.getMenuInflater().inflate(R.menu.menu_settings, popupMenu.getMenu());
         popupMenu.getMenu()
                 .findItem(R.id.action_dark_theme)
-                .setChecked(mAppSetting.getBoolean(AppSetting.KEY_DARK_THEME, false));
+                .setChecked(mSetting.getBoolean(AppSetting.KEY_DARK_THEME, false));
         popupMenu.setOnMenuItemClickListener(this);
         menuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,7 +255,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         menuBtn.setOnTouchListener(popupMenu.getDragToOpenListener());
 
         mSchedulerBtn = findViewById(R.id.btn_scheduler);
-        if (mAppSetting.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
+        if (mSetting.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
             mSchedulerBtn.setImageResource(R.drawable.ic_alarm_black_24dp);
         } else {
             mSchedulerBtn.setImageResource(R.drawable.ic_alarm_off_black_24dp);
@@ -294,7 +300,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         RecyclerView recyclerView = findViewById(R.id.container_color);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recyclerView.setAdapter(new ColorAdapter(this));
+        recyclerView.setAdapter(new ColorAdapter(this, this));
 
         FrameLayout rootLayout = findViewById(R.id.root_layout);
         rootLayout.setOnClickListener(new View.OnClickListener() {
@@ -317,7 +323,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         new SchedulerDialog(this, new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                if (mAppSetting.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
+                if (mSetting.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
                     mSchedulerBtn.setImageResource(R.drawable.ic_alarm_black_24dp);
                 } else {
                     mSchedulerBtn.setImageResource(R.drawable.ic_alarm_off_black_24dp);
@@ -329,7 +335,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     @Override
     public void onPause() {
         super.onPause();
-        mAppSetting.putInt(AppSetting.KEY_BRIGHTNESS, mSeekbar.getProgress());
+        mSetting.putInt(AppSetting.KEY_BRIGHTNESS, mSeekbar.getProgress());
     }
 
     @Override
@@ -351,7 +357,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
 
     private void applyNewMode(int targetMode) {
-        if (isRunning && targetMode != mAppSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION)) {
+        if (isRunning && targetMode != mSetting.getInt(AppSetting.KEY_MODE, Constants.MODE_NO_PERMISSION)) {
             mSwitch.toggle();
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -360,7 +366,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 }
             }, 500);
         }
-        mAppSetting.putInt(AppSetting.KEY_MODE, targetMode);
+        mSetting.putInt(AppSetting.KEY_MODE, targetMode);
         mModeText.setText(getResources().getStringArray(R.array.mode_text)[targetMode]
                 + ((targetMode == Constants.MODE_NO_PERMISSION && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 ? " " + getString(R.string.mode_text_no_permission_warning)
@@ -371,13 +377,26 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     public boolean onMenuItemClick(final MenuItem menuItem) {
         int id = menuItem.getItemId();
         if (id == R.id.action_dark_theme) {
-            mAppSetting.putBoolean(AppSetting.KEY_DARK_THEME, !menuItem.isChecked());
+            mSetting.putBoolean(AppSetting.KEY_DARK_THEME, !menuItem.isChecked());
             menuItem.setChecked(!menuItem.isChecked());
             finish();
             startActivity(new Intent(this, MainActivity.class));
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onColorClicked(int color) {
+        mSetting.setFilterColor(color);
+        if (isRunning) {
+            Intent intent = new Intent(this, MaskService.class);
+            intent.setAction(ACTION_UPDATE_STATUS);
+            intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE_COLOR);
+            intent.putExtra(Constants.EXTRA_COLOR, color);
+            intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
+            startService(intent);
+        }
     }
 
     public static class MessageReceiver extends BroadcastReceiver {

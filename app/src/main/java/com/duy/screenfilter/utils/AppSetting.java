@@ -1,33 +1,34 @@
 package com.duy.screenfilter.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 
-import com.duy.screenfilter.R;
-
-@SuppressLint("CommitPrefEdits")
 public class AppSetting {
-
-    public static final String PREFERENCES_NAME = "settings";
-
-    public static final String KEY_BRIGHTNESS = "brightness",
-            KEY_MODE = "mode", KEY_FIRST_RUN = "first_run",
-            KEY_DARK_THEME = "dark_theme", KEY_AUTO_MODE = "auto_mode",
-            KEY_HOURS_SUNRISE = "hrs_sunrise", KEY_MINUTES_SUNRISE = "min_sunrise",
-            KEY_HOURS_SUNSET = "hrs_sunset", KEY_MINUTES_SUNSET = "min_sunset";
-
-
+    public static final String KEY_BRIGHTNESS = "brightness";
+    public static final String KEY_MODE = "mode";
+    public static final String KEY_FIRST_RUN = "first_run";
+    public static final String KEY_DARK_THEME = "dark_theme";
+    public static final String KEY_AUTO_MODE = "auto_mode";
+    public static final String KEY_HOURS_SUNRISE = "hrs_sunrise";
+    public static final String KEY_MINUTES_SUNRISE = "min_sunrise";
+    public static final String KEY_HOURS_SUNSET = "hrs_sunset";
+    public static final String KEY_MINUTES_SUNSET = "min_sunset";
+    public static final String KEY_COLOR = "color";
+    private static final String PREF_NAME = "setting";
+    private static final String TAG = "AppSetting";
+    private volatile static AppSetting sInstance;
     private SharedPreferences mPrefs;
-    private Context context;
 
     private AppSetting(Context context) {
-        mPrefs = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_MULTI_PROCESS);
-        this.context = context;
+        this.mPrefs = context.getSharedPreferences(PREF_NAME, Context.MODE_MULTI_PROCESS);
     }
 
-    public static AppSetting newInstance(Context context) {
-        return new AppSetting(context);
+    public static AppSetting getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new AppSetting(context);
+        }
+        return sInstance;
     }
 
     public AppSetting putBoolean(String key, boolean value) {
@@ -59,17 +60,19 @@ public class AppSetting {
     }
 
     public String getString(String key, String defValue) {
-        return mPrefs.getString(key, defValue);
+        try {
+            return mPrefs.getString(key, defValue);
+        } catch (Exception e) {
+            return defValue;
+        }
     }
-
 
     public int getFilterColor() {
-        return getInt(context.getString(R.string.key_pref_color),
-                context.getResources().getColor(R.color.grey_800));
+        return getInt(KEY_COLOR, Color.BLACK);
     }
 
-
-    public void setFilterColor(int color) {
-        mPrefs.edit().putInt(context.getString(R.string.key_pref_color), color).apply();
+    public AppSetting setFilterColor(int color) {
+        mPrefs.edit().putInt(KEY_COLOR, color).apply();
+        return this;
     }
 }

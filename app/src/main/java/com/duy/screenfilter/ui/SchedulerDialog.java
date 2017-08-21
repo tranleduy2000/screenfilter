@@ -57,7 +57,7 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
     }
 
     private void init() {
-        mSettings = AppSetting.newInstance(getContext());
+        mSettings = AppSetting.getInstance(getContext());
         hrsSunrise = mSettings.getInt(AppSetting.KEY_HOURS_SUNRISE, 6);
         minSunrise = mSettings.getInt(AppSetting.KEY_MINUTES_SUNRISE, 0);
         hrsSunset = mSettings.getInt(AppSetting.KEY_HOURS_SUNSET, 22);
