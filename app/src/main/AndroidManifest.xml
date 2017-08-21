@@ -49,7 +49,7 @@
 
         <service android:name=".services.MaskService" android:process=":mask"/>
 
-        <receiver android:name=".receiver.TileReceiver"
+        <receiver android:name=".services.TileReceiver"
                   android:exported="false">
             <intent-filter>
                 <action android:name="info.papdt.blackbulb.ACTION_UPDATE_STATUS" />
@@ -71,15 +71,6 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".services.MaskTileService"
-            android:icon="@drawable/ic_brightness_2_white_36dp"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-        </service>
     </application>
 
 </manifest>

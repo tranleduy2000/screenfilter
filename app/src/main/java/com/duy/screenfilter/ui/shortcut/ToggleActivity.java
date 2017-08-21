@@ -7,9 +7,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 
-import com.duy.screenfilter.C;
+import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
-import com.duy.screenfilter.receiver.TileReceiver;
+import com.duy.screenfilter.services.TileReceiver;
 import com.duy.screenfilter.services.MaskService;
 
 public class ToggleActivity extends Activity {
@@ -34,8 +34,8 @@ public class ToggleActivity extends Activity {
             finish();
         } else {
             Intent i = new Intent(this, MaskService.class);
-            i.putExtra(C.EXTRA_ACTION, C.ACTION_CHECK);
-            i.putExtra(C.EXTRA_CHECK_FROM_TOGGLE, true);
+            i.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_CHECK);
+            i.putExtra(Constants.EXTRA_CHECK_FROM_TOGGLE, true);
             startService(i);
             finish();
         }
@@ -46,12 +46,12 @@ public class ToggleActivity extends Activity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            int eventId = intent.getIntExtra(C.EXTRA_EVENT_ID, -1);
+            int eventId = intent.getIntExtra(Constants.EXTRA_EVENT_ID, -1);
             switch (eventId) {
-                case C.EVENT_CHECK:
+                case Constants.EVENT_CHECK:
                     Intent i = new Intent();
                     i.setAction(TileReceiver.ACTION_UPDATE_STATUS);
-                    i.putExtra(C.EXTRA_ACTION, intent.getBooleanExtra("isShowing", false) ? C.ACTION_STOP : C.ACTION_START);
+                    i.putExtra(Constants.EXTRA_ACTION, intent.getBooleanExtra("isShowing", false) ? Constants.ACTION_STOP : Constants.ACTION_START);
                     context.sendBroadcast(i);
                     break;
             }

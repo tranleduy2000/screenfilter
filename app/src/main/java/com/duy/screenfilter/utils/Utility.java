@@ -11,7 +11,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.duy.screenfilter.C;
+import com.duy.screenfilter.Constants;
 
 import java.util.Calendar;
 
@@ -87,24 +87,24 @@ public class Utility {
 
             Log.i(TAG, "Reset alarm");
 
-            cancelAlarm(context, REQUEST_ALARM_SUNRISE, C.ALARM_ACTION_STOP);
-            cancelAlarm(context, REQUEST_ALARM_SUNSET, C.ALARM_ACTION_START);
+            cancelAlarm(context, REQUEST_ALARM_SUNRISE, Constants.ALARM_ACTION_STOP);
+            cancelAlarm(context, REQUEST_ALARM_SUNSET, Constants.ALARM_ACTION_START);
             setAlarm(context,
                     AlarmManager.RTC_WAKEUP,
                     sunriseCalendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY,
                     REQUEST_ALARM_SUNRISE,
-                    C.ALARM_ACTION_STOP);
+                    Constants.ALARM_ACTION_STOP);
             setAlarm(context,
                     AlarmManager.RTC_WAKEUP,
                     sunsetCalendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY,
                     REQUEST_ALARM_SUNSET,
-                    C.ALARM_ACTION_START);
+                    Constants.ALARM_ACTION_START);
         } else {
             Log.i(TAG, "Cancel alarm");
-            cancelAlarm(context, REQUEST_ALARM_SUNRISE, C.ALARM_ACTION_STOP);
-            cancelAlarm(context, REQUEST_ALARM_SUNSET, C.ALARM_ACTION_START);
+            cancelAlarm(context, REQUEST_ALARM_SUNRISE, Constants.ALARM_ACTION_STOP);
+            cancelAlarm(context, REQUEST_ALARM_SUNSET, Constants.ALARM_ACTION_START);
         }
     }
 
