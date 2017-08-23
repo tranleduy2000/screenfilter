@@ -1,5 +1,6 @@
 package com.duy.screenfilter.utils;
 
+import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -12,15 +13,17 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.duy.screenfilter.Constants;
+import com.duy.screenfilter.services.MaskService;
 
 import java.util.Calendar;
+
+import static android.app.ActivityManager.RunningServiceInfo;
 
 @SuppressWarnings("unchecked")
 public class Utility {
 
-    public static final int CM_TILE_CODE = 1001;
-
-    public static final int REQUEST_ALARM_SUNRISE = 1002, REQUEST_ALARM_SUNSET = 1003;
+    public static final int REQUEST_ALARM_SUNRISE = 1002;
+    public static final int REQUEST_ALARM_SUNSET = 1003;
 
     public static final String TAG = Utility.class.getSimpleName();
 
@@ -44,6 +47,8 @@ public class Utility {
 
 
     public static void updateAlarmSettings(Context context) {
+        if (true) return;
+
         AppSetting settings = AppSetting.getInstance(context);
         if (settings.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
             int hrsSunrise = settings.getInt(AppSetting.KEY_HOURS_SUNRISE, 6);
@@ -108,4 +113,14 @@ public class Utility {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
     }
 
+    public static boolean isScreenFilterServiceRunning(Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            Log.d(TAG, "isScreenFilterServiceRunning: " + service.service.getClassName());
+            if (MaskService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

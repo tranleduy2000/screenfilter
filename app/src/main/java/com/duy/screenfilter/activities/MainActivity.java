@@ -14,12 +14,16 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.duy.screenfilter.BuildConfig;
@@ -27,19 +31,19 @@ import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.model.ColorProfile;
 import com.duy.screenfilter.services.MaskService;
+import com.duy.screenfilter.services.TileReceiver;
 import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
-import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
+import com.duy.screenfilter.utils.Utility;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
-
-import static com.duy.screenfilter.services.TileReceiver.ACTION_UPDATE_STATUS;
 
 public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
     private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
+    private static final String TAG = "MainActivity";
     public boolean isRunning = false;
-    private MaterialAnimatedSwitch mSwitch;
+    private Switch mSwitch;
     private final Handler mHandler = new Handler() {
 
         @Override
@@ -54,14 +58,13 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         }
 
     };
-    private boolean hasDismissFirstRunDialog = false;
     private DiscreteSeekBar mColorTemp, mIntensity, mDim;
     private ImageButton mSchedulerBtn;
     private PopupMenu popupMenu;
-    private AlertDialog mAlertDialog;
     private AppSetting mSetting;
     private boolean isAnimateRunning;
     private TextView txtColorTemp;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,71 +140,26 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         super.onBackPressed();
     }
 
-
     private void bindView() {
         Intent i = new Intent(this, MaskService.class);
         startService(i);
-
         mSwitch = findViewById(R.id.toggle);
-        mSwitch.setOnCheckedChangeListener(new MaterialAnimatedSwitch.OnCheckedChangeListener() {
+        if (Utility.isScreenFilterServiceRunning(this)) {
+            Log.i(TAG, "bindView: Service is running");
+            if (!mSwitch.isChecked()) {
+                mSwitch.setChecked(true);
+            }
+        }
+        mSwitch.setOnCheckedChangeListener(new SwitchCompat.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(boolean b) {
-                if (b) {
-                    Intent intent = new Intent();
-                    intent.setAction(ACTION_UPDATE_STATUS);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
-                    intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
-                    sendBroadcast(intent);
-                    isRunning = true;
-
-                    // For safe
-                    if (mSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
-                        if (mAlertDialog != null && mAlertDialog.isShowing()) {
-                            return;
-                        }
-                        hasDismissFirstRunDialog = false;
-                        mAlertDialog = new AlertDialog.Builder(MainActivity.this)
-                                .setTitle(R.string.dialog_first_run_title)
-                                .setMessage(R.string.dialog_first_run_message)
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        hasDismissFirstRunDialog = true;
-                                        mSetting.putBoolean(AppSetting.KEY_FIRST_RUN, false);
-                                    }
-                                })
-                                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(DialogInterface dialogInterface) {
-                                        if (hasDismissFirstRunDialog) return;
-                                        hasDismissFirstRunDialog = true;
-                                        mSwitch.toggle();
-                                        if (mSetting.getBoolean(AppSetting.KEY_FIRST_RUN, true)) {
-                                            Intent intent = new Intent(MainActivity.this, MaskService.class);
-                                            intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
-                                            stopService(intent);
-                                            isRunning = false;
-                                        }
-                                    }
-                                })
-                                .show();
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (mAlertDialog.isShowing() && !hasDismissFirstRunDialog) {
-                                    mAlertDialog.dismiss();
-                                }
-                            }
-                        }, 5000);
-                    }
+            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
+                if (checked) {
+                    sendBroadcastStartService();
                 } else {
-                    Intent intent = new Intent(MainActivity.this, MaskService.class);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
-                    intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
-                    stopService(intent);
-                    isRunning = false;
+                    sendBroadcastStopService();
                 }
             }
+
         });
 
         setupSeekBar();
@@ -229,6 +187,17 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         });
         menuBtn.setOnTouchListener(popupMenu.getDragToOpenListener());
 
+//        setupScheduler();
+        FrameLayout rootLayout = findViewById(R.id.root_layout);
+        rootLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+    }
+
+    private void setupScheduler() {
         mSchedulerBtn = findViewById(R.id.btn_scheduler);
         if (mSetting.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
             mSchedulerBtn.setImageResource(R.drawable.ic_alarm_black_24dp);
@@ -272,13 +241,22 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             }
         });
 
-        FrameLayout rootLayout = findViewById(R.id.root_layout);
-        rootLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
+    }
+
+    private void sendBroadcastStopService() {
+        Intent intent = new Intent();
+        intent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+        intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
+        sendBroadcast(intent);
+        isRunning = false;
+    }
+
+    private void sendBroadcastStartService() {
+        Intent intent = new Intent();
+        intent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+        intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
+        sendBroadcast(intent);
+        isRunning = true;
     }
 
     private void setupSeekBar() {
@@ -461,6 +439,4 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             }
         }, 500);
     }
-
-
 }

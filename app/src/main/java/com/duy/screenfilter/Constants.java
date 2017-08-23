@@ -7,8 +7,6 @@ public class Constants {
      */
     public static final String EXTRA_ACTION = "action";
     public static final String EXTRA_COLOR_PROFILE = "color";
-    public static final String EXTRA_CHECK_FROM_TOGGLE = "check_from_toggle";
-    public static final String EXTRA_DO_NOT_SEND_CHECK = "dont_send_check";
 
     public static final String ALARM_ACTION_START = "info.papdt.blackbulb.ALARM_ACTION_START";
     public static final String ALARM_ACTION_STOP = "info.papdt.blackbulb.ALARM_ACTION_STOP";

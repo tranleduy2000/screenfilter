@@ -211,7 +211,6 @@ public class MaskService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int arg) {
         Log.d(TAG, "onStartCommand() called with: intent = [" + intent + "], flags = [" + flags + "], arg = [" + arg + "]");
-
         if (intent != null && intent.hasExtra(Constants.EXTRA_ACTION)) {
             String action = intent.getStringExtra(Constants.EXTRA_ACTION);
             switch (action) {
@@ -229,26 +228,13 @@ public class MaskService extends Service {
                     break;
             }
         }
-
-        if (intent != null && !intent.getBooleanExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, false)) {
-            Log.i(TAG, "Check Mask. Check from toggle:" + intent.getBooleanExtra(Constants.EXTRA_CHECK_FROM_TOGGLE, false));
-            Intent broadcastIntent = new Intent();
-            broadcastIntent.setAction(
-                    intent.getBooleanExtra(Constants.EXTRA_CHECK_FROM_TOGGLE, false)
-                            ? "info.papdt.blackbulb.ACTION_TOGGLE"
-                            : "info.papdt.blackbulb.ACTION_UPDATE_ACTIVITY_TOGGLE"
-            );
-            broadcastIntent.putExtra(Constants.EXTRA_EVENT_ID, Constants.EVENT_CHECK);
-            broadcastIntent.putExtra("isShowing", isShowing);
-            sendBroadcast(broadcastIntent);
-        }
-
         return START_STICKY;
     }
 
     private void stop(Intent intent) {
         Log.i(TAG, "Stop Mask");
         isShowing = false;
+        stopForeground(true);
         stopSelf();
     }
 

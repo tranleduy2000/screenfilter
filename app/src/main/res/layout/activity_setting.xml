@@ -50,18 +50,11 @@
                     android:text="@string/app_name"
                     android:textAppearance="@android:style/TextAppearance.Material.Small"/>
 
-                <com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch
-                    xmlns:android="http://schemas.android.com/apk/res/android"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                <Switch
                     android:id="@+id/toggle"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:ball_press_color="@color/deep_purple_700"
-                    app:ball_release_color="@color/deep_orange_700"
-                    app:base_press_color="@color/deep_purple_100"
-                    app:base_release_color="@color/deep_orange_100"
-                    app:icon_press="@drawable/ic_brightness_2_white_36dp"
-                    app:icon_release="@drawable/ic_wb_sunny_white_36dp"/>
+                    android:checked="false"/>
 
                 <ImageButton
                     android:id="@+id/btn_scheduler"
@@ -71,7 +64,8 @@
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:src="@drawable/ic_alarm_black_24dp"
-                    android:tint="?attr/overflow_tint"/>
+                    android:tint="?attr/overflow_tint"
+                    android:visibility="gone"/>
 
                 <ImageButton
                     android:id="@+id/btn_menu"

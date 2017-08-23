@@ -20,28 +20,23 @@ public class TileReceiver extends BroadcastReceiver {
         Log.i(TAG, "received \"" + intent.getAction() + "\" action");
         if (ACTION_UPDATE_STATUS.equals(intent.getAction())) {
             String action = intent.getStringExtra(Constants.EXTRA_ACTION);
-            boolean dontSendCheck = intent.getBooleanExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, false);
-
             Log.i(TAG, "handle \"" + action + "\" action");
             switch (action) {
                 case Constants.ACTION_START:
                     Intent intent1 = new Intent(context, MaskService.class);
                     intent1.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
                     intent1.putExtra(Constants.EXTRA_COLOR_PROFILE, settings.getColorProfile());
-                    intent1.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, dontSendCheck);
                     context.startService(intent1);
                     break;
                 case Constants.ACTION_PAUSE:
                     Intent intent2 = new Intent(context, MaskService.class);
                     intent2.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
                     intent2.putExtra(Constants.EXTRA_COLOR_PROFILE, settings.getColorProfile());
-                    intent2.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, dontSendCheck);
                     context.startService(intent2);
                     break;
                 case Constants.ACTION_STOP:
                     Intent intent3 = new Intent(context, MaskService.class);
                     intent3.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
-                    intent3.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, dontSendCheck);
                     context.startService(intent3);
                     break;
             }
@@ -49,13 +44,11 @@ public class TileReceiver extends BroadcastReceiver {
             Utility.updateAlarmSettings(context);
             Intent intent1 = new Intent(context, MaskService.class);
             intent1.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
-            intent1.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, false);
             context.startService(intent1);
         } else if (Constants.ALARM_ACTION_STOP.equals(intent.getAction())) {
             Utility.updateAlarmSettings(context);
             Intent intent1 = new Intent(context, MaskService.class);
             intent1.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
-            intent1.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, false);
             context.startService(intent1);
         }
     }
