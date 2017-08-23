@@ -35,5 +35,8 @@
 	<string name="dialog_ignore_battery_opt_msg">It may not automatically activate/deactivate on time because of Android 6.0 Doze mode. If you have any problem, try to request system to ignore battery optimization.</string>
 	<string name="dialog_button_go_to_set">Go to set</string>
     <string name="play_store">Goto Play Store</string>
+    <string name="color_temperature">Color temperature</string>
+	<string name="dim_level">Dim level</string>
+	<string name="insensiti">Insensity</string>
 
 </resources>

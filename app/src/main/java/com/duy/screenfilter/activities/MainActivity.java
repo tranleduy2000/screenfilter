@@ -22,6 +22,7 @@ import android.view.ViewAnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.duy.screenfilter.BuildConfig;
@@ -34,6 +35,8 @@ import com.duy.screenfilter.utils.AppSetting;
 import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
+
+import java.util.Locale;
 
 import static com.duy.screenfilter.services.TileReceiver.ACTION_UPDATE_STATUS;
 
@@ -63,6 +66,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     private AlertDialog mAlertDialog;
     private AppSetting mSetting;
     private boolean isAnimateRunning;
+    private TextView txtColorTemp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,6 +287,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     }
 
     private void setupSeekBar() {
+        txtColorTemp = findViewById(R.id.txt_color_temp);
         mColorTemp = findViewById(R.id.seek_bar_temp);
         mIntensity = findViewById(R.id.seek_bar_intensity);
         mDim = findViewById(R.id.seek_bar_dim);
@@ -305,6 +310,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                     intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
                     startService(intent);
                 }
+                txtColorTemp.setText(String.format(Locale.US, "%x/%x", 500 + value * 30, 3500));
             }
 
             @Override

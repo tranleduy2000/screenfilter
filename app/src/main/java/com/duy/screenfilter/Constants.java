@@ -15,7 +15,6 @@ public class Constants {
 
     public static final String ACTION_START = "start";
     public static final String ACTION_UPDATE = "update";
-    public static final String ACTION_UPDATE_COLOR = "update_color";
     public static final String ACTION_PAUSE = "pause";
     public static final String ACTION_STOP = "stop";
     public static final String ACTION_CHECK = "check";
