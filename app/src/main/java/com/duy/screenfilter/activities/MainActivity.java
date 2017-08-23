@@ -1,6 +1,7 @@
 package com.duy.screenfilter.activities;
 
 import android.animation.Animator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -263,13 +264,9 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         mDim = findViewById(R.id.seek_bar_dim);
 
         final ColorProfile colorProfile = mSetting.getColorProfile();
-        mColorTemp.setProgress(colorProfile.getColor());
-        mIntensity.setProgress(colorProfile.getIntensity());
-        mDim.setProgress(colorProfile.getDimLevel());
-
         mColorTemp.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             int v = -1;
-
+            @SuppressLint("SetTextI18n")
             @Override
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
@@ -280,7 +277,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                     intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
                     startService(intent);
                 }
-                txtColorTemp.setText((500 + value * 30f) + "k/3500k");
+                txtColorTemp.setText((500 + value * 30) + "k/3500k");
             }
 
             @Override
@@ -349,6 +346,10 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 }
             }
         });
+
+        mColorTemp.setProgress(colorProfile.getColor());
+        mIntensity.setProgress(colorProfile.getIntensity());
+        mDim.setProgress(colorProfile.getDimLevel());
     }
 
     private void initWindow() {
