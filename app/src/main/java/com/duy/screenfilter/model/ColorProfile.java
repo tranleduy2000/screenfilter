@@ -110,27 +110,29 @@ public class ColorProfile implements Serializable {
         return (float) bits / 255.0F;
     }
 
-    private double constrains(int value, int min, int max) {
-        if (value < min) return min;
-        if (value > max) return max;
-        return value;
+    private int truncate(double value) {
+        if (value < 0) return 0;
+        if (value > 255) return 255;
+        return (int) value;
     }
 
     // After: http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
-    private int rgbFromColor(int color) {
+    public final int rgbFromColor(int color) {
         int colorTemperature = getColorTemperature(color);
-        int alpha = 255; //max
-        double temp = (float) colorTemperature / 100.0f;
-        int red = (int) ((temp <= 66) ? 255.0d : 329.698727446 * Math.pow(temp - 60, -0.1332047592));
-        int green = (int) ((temp <= 66)
-                ? 99.4708025861 * Math.log(temp) - 161.1195681661
-                : 288.1221695283 * Math.pow(temp - 60, -0.0755148492));
-        int blue = 0;
-        if (temp >= 66) blue = (int) 255.0d;
-        else if (temp > 19) blue = (int) 0.0d;
-        else blue = (int) (138.5177312231 * Math.log(temp - 10) - 305.0447927307);
-        return Color.argb(alpha, red, green, blue);
+        short alpha = 255;
+        double temp = (double) colorTemperature / (double) 100.0F;
+        double red = temp <= (double) 66
+                ? 255.0D
+                : 329.698727446D * Math.pow(temp - (double) 60, -0.1332047592D);
+        double green = temp <= (double) 66
+                ? 99.4708025861D * Math.log(temp) - 161.1195681661D
+                : 288.1221695283D * Math.pow(temp - (double) 60, -0.0755148492D);
+        double blue = temp >= (double) 66 ? 255.0D : (temp < (double) 19
+                ? 0.0D
+                : 138.5177312231D * Math.log(temp - (double) 10) - 305.0447927307D);
+        return Color.argb(alpha, truncate(red), truncate(green), truncate(blue));
     }
+
 
     private int getColorTemperature(int color) {
         return 500 + color * 30;

@@ -65,11 +65,7 @@ public class MaskService extends Service {
 
     private void createMaskView(Intent startIntent) {
         mColorProfile = (ColorProfile) startIntent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
-        mAccessibilityManager.isEnabled();
-
         updateLayoutParams();
-
-
         try {
             mWindowManager.addView(mMaskView, mLayoutParams);
         } catch (Exception e) {
@@ -83,18 +79,19 @@ public class MaskService extends Service {
     }
 
     private void updateLayoutParams() {
-        if (mLayoutParams == null) mLayoutParams = new LayoutParams();
+        if (mLayoutParams == null) {
+            int max = Math.max(Utility.getTrueScreenWidth(this), Utility.getTrueScreenHeight(this));
 
-        this.mAccessibilityManager.isEnabled();
-        mLayoutParams.type = LayoutParams.TYPE_SYSTEM_OVERLAY;
+            mLayoutParams = new LayoutParams();
+            mLayoutParams.type = LayoutParams.TYPE_SYSTEM_OVERLAY;
+            mLayoutParams.height = mLayoutParams.width = max + 200;
+            mLayoutParams.flags |= LayoutParams.FLAG_NOT_TOUCHABLE;
+            mLayoutParams.flags |= LayoutParams.FLAG_NOT_FOCUSABLE;
+            mLayoutParams.flags |= LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+            mLayoutParams.format = PixelFormat.TRANSPARENT;
+            mLayoutParams.gravity = Gravity.CENTER;
+        }
 
-        int max = Math.max(Utility.getTrueScreenWidth(this), Utility.getTrueScreenHeight(this));
-        mLayoutParams.height = mLayoutParams.width = max + 200;
-        mLayoutParams.flags |= LayoutParams.FLAG_NOT_TOUCHABLE;
-        mLayoutParams.flags |= LayoutParams.FLAG_NOT_FOCUSABLE;
-        mLayoutParams.flags |= LayoutParams.FLAG_LAYOUT_NO_LIMITS;
-        mLayoutParams.format = PixelFormat.TRANSPARENT;
-        mLayoutParams.gravity = Gravity.CENTER;
 
         if (mMaskView == null) {
             mMaskView = new MaskView(this);
@@ -102,18 +99,8 @@ public class MaskService extends Service {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
         }
+        Log.d(TAG, "updateLayoutParams: " + mColorProfile);
         mMaskView.setProfile(mColorProfile);
-
-    }
-
-    private float constrain(float paramFloat1, float paramFloat2, float paramFloat3) {
-        if (paramFloat1 < paramFloat2) {
-            return paramFloat2;
-        }
-        if (paramFloat1 > paramFloat3) {
-            return paramFloat3;
-        }
-        return paramFloat1;
     }
 
     private void destroyMaskView() {
@@ -241,7 +228,6 @@ public class MaskService extends Service {
                     update(intent);
                     break;
             }
-
         }
 
         if (intent != null && !intent.getBooleanExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, false)) {
@@ -280,7 +266,6 @@ public class MaskService extends Service {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.i(TAG, "Set alpha:" + String.valueOf(100 - intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, 0)));
     }
 
     private void pause(Intent intent) {
@@ -295,7 +280,7 @@ public class MaskService extends Service {
     private void update(Intent intent) {
         Log.i(TAG, "Update Mask");
         mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
-        mAccessibilityManager.isEnabled();
+
         try {
             updateLayoutParams();
             mWindowManager.updateViewLayout(mMaskView, mLayoutParams);

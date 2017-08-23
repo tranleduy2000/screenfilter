@@ -2,7 +2,6 @@ package com.duy.screenfilter.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 
 import com.duy.screenfilter.model.ColorProfile;
 
@@ -68,14 +67,6 @@ public class AppSetting {
         }
     }
 
-    public int getFilterColor() {
-        return getInt(KEY_COLOR, Color.BLACK);
-    }
-
-    public AppSetting setFilterColor(int color) {
-        mPrefs.edit().putInt(KEY_COLOR, color).apply();
-        return this;
-    }
 
 
     public ColorProfile getColorProfile() {
