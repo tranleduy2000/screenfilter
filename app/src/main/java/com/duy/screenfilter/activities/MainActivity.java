@@ -14,16 +14,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.duy.screenfilter.BuildConfig;
@@ -35,6 +31,7 @@ import com.duy.screenfilter.services.TileReceiver;
 import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
 import com.duy.screenfilter.utils.Utility;
+import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
@@ -43,7 +40,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
     private static final String TAG = "MainActivity";
     public boolean isRunning = false;
-    private Switch mSwitch;
+    private MaterialAnimatedSwitch mSwitch;
     private final Handler mHandler = new Handler() {
 
         @Override
@@ -141,27 +138,27 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     }
 
     private void bindView() {
-        Intent i = new Intent(this, MaskService.class);
-        startService(i);
         mSwitch = findViewById(R.id.toggle);
         if (Utility.isScreenFilterServiceRunning(this)) {
-            Log.i(TAG, "bindView: Service is running");
             if (!mSwitch.isChecked()) {
-                mSwitch.setChecked(true);
+                mSwitch.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mSwitch.toggle();
+                    }
+                });
             }
         }
-        mSwitch.setOnCheckedChangeListener(new SwitchCompat.OnCheckedChangeListener() {
+        mSwitch.setOnCheckedChangeListener(new MaterialAnimatedSwitch.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                if (checked) {
+            public void onCheckedChanged(boolean isChecked) {
+                if (isChecked) {
                     sendBroadcastStartService();
                 } else {
                     sendBroadcastStopService();
                 }
             }
-
         });
-
         setupSeekBar();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
