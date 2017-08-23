@@ -4,7 +4,7 @@ import android.app.Application;
 
 import com.duy.screenfilter.utils.Utility;
 
-public class BlackbulbApplication extends Application {
+public class ScreenFilterApplication extends Application {
 
     @Override
     public void onCreate() {

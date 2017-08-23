@@ -7,14 +7,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.annotation.ColorInt;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
@@ -22,7 +19,9 @@ import android.view.accessibility.AccessibilityManager;
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.activities.MainActivity;
+import com.duy.screenfilter.model.ColorProfile;
 import com.duy.screenfilter.utils.Utility;
+import com.duy.screenfilter.view.MaskView;
 
 import static android.view.WindowManager.LayoutParams;
 
@@ -32,17 +31,15 @@ public class MaskService extends Service {
     private static final int NOTIFICATION_NO = 1024;
     private static final String TAG = "MaskService";
 
-    private int brightness = 50;
     private WindowManager mWindowManager;
     private NotificationManager mNotificationManager;
     private AccessibilityManager mAccessibilityManager;
-    private Notification mNoti;
-    private View mLayout;
+    private Notification mNotification;
+    private MaskView mMaskView;
     private LayoutParams mLayoutParams;
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
-    @ColorInt
-    private int color = Color.BLACK;
+    private ColorProfile mColorProfile = null;
 
     @Override
     public void onCreate() {
@@ -67,23 +64,14 @@ public class MaskService extends Service {
     }
 
     private void createMaskView(Intent startIntent) {
-        color = startIntent.getIntExtra(Constants.EXTRA_COLOR, color);
+        mColorProfile = (ColorProfile) startIntent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
         mAccessibilityManager.isEnabled();
 
-        updateLayoutParams(-1, color);
-        mLayoutParams.gravity = Gravity.CENTER;
+        updateLayoutParams();
 
-        if (mLayout == null) {
-            mLayout = new View(this);
-            mLayout.setLayoutParams(new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT));
-            mLayout.setBackgroundColor(color);
-            mLayout.setAlpha(0f);
-        }
 
         try {
-            mWindowManager.addView(mLayout, mLayoutParams);
+            mWindowManager.addView(mMaskView, mLayoutParams);
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -94,7 +82,7 @@ public class MaskService extends Service {
         }
     }
 
-    private void updateLayoutParams(int brightness, int color) {
+    private void updateLayoutParams() {
         if (mLayoutParams == null) mLayoutParams = new LayoutParams();
 
         this.mAccessibilityManager.isEnabled();
@@ -106,24 +94,16 @@ public class MaskService extends Service {
         mLayoutParams.flags |= LayoutParams.FLAG_NOT_FOCUSABLE;
         mLayoutParams.flags |= LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         mLayoutParams.format = PixelFormat.TRANSPARENT;
-        float targetAlpha = (100 - this.brightness) * 0.01f;
-        if (brightness != -1) {
-            if (isShowing) {
-                if (Math.abs(targetAlpha - mLayout.getAlpha()) < 0.1f) {
-                    mLayout.setAlpha(targetAlpha);
-                } else {
-                    mLayout.animate().alpha(targetAlpha).setDuration(100).start();
-                }
-            } else {
-                mLayout.animate().alpha(targetAlpha).setDuration(ANIMATE_DURATION_MILES).start();
-            }
-        }
+        mLayoutParams.gravity = Gravity.CENTER;
 
-        if (mLayout != null) {
-            int alpha = (int) ((100 - this.brightness) * 0.01f * 255);
-            mLayout.setBackgroundColor(Color.argb(alpha,
-                    Color.red(color), Color.green(color), Color.blue(color)));
+        if (mMaskView == null) {
+            mMaskView = new MaskView(this);
+            mMaskView.setLayoutParams(new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
         }
+        mMaskView.setProfile(mColorProfile);
+
     }
 
     private float constrain(float paramFloat1, float paramFloat2, float paramFloat3) {
@@ -139,8 +119,8 @@ public class MaskService extends Service {
     private void destroyMaskView() {
         isShowing = false;
         cancelNotification();
-        if (mLayout != null) {
-            mLayout.animate()
+        if (mMaskView != null) {
+            mMaskView.animate()
                     .alpha(0f)
                     .setDuration(ANIMATE_DURATION_MILES)
                     .setListener(new Animator.AnimatorListener() {
@@ -152,8 +132,8 @@ public class MaskService extends Service {
                         @Override
                         public void onAnimationEnd(Animator animator) {
                             try {
-                                mWindowManager.removeViewImmediate(mLayout);
-                                mLayout = null;
+                                mWindowManager.removeViewImmediate(mMaskView);
+                                mMaskView = null;
                             } catch (Exception ignored) {
                             }
                         }
@@ -176,16 +156,15 @@ public class MaskService extends Service {
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent pauseIntent = new Intent();
         pauseIntent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
-        Log.i(TAG, "Create " + Constants.ACTION_PAUSE + " action");
         pauseIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
-        pauseIntent.putExtra(Constants.EXTRA_BRIGHTNESS, brightness);
+        pauseIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 
         Notification.Action pauseAction = new Notification.Action(
                 R.drawable.ic_wb_incandescent_black_24dp,
                 getString(R.string.notification_action_turn_off),
                 PendingIntent.getBroadcast(getBaseContext(), 0, pauseIntent, Intent.FILL_IN_DATA));
 
-        mNoti = new Notification.Builder(getApplicationContext())
+        mNotification = new Notification.Builder(getApplicationContext())
                 .setContentTitle(getString(R.string.notification_running_title))
                 .setContentText(getString(R.string.notification_running_msg))
                 .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
@@ -206,7 +185,7 @@ public class MaskService extends Service {
         Intent resumeIntent = new Intent();
         resumeIntent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
         resumeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
-        resumeIntent.putExtra(Constants.EXTRA_BRIGHTNESS, brightness);
+        resumeIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 
         Intent closeIntent = new Intent(this, MaskService.class);
         closeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
@@ -215,7 +194,7 @@ public class MaskService extends Service {
                 getString(R.string.notification_action_turn_on),
                 PendingIntent.getBroadcast(getBaseContext(), 0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 
-        mNoti = new Notification.Builder(getApplicationContext())
+        mNotification = new Notification.Builder(getApplicationContext())
                 .setContentTitle(getString(R.string.notification_paused_title))
                 .setContentText(getString(R.string.notification_paused_msg))
                 .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
@@ -230,8 +209,8 @@ public class MaskService extends Service {
     }
 
     private void showPausedNotification() {
-        if (mNoti == null) createPauseNotification();
-        mNotificationManager.notify(NOTIFICATION_NO, mNoti);
+        if (mNotification == null) createPauseNotification();
+        mNotificationManager.notify(NOTIFICATION_NO, mNotification);
     }
 
     private void cancelNotification() {
@@ -258,12 +237,7 @@ public class MaskService extends Service {
                 case Constants.ACTION_STOP:
                     this.stop(intent);
                     break;
-                case Constants.ACTION_UPDATE_BRIGHTNESS:
-                    Log.d(TAG, "onStartCommand: update brightness");
-                    update(intent);
-                    break;
-                case Constants.ACTION_UPDATE_COLOR:
-                    Log.d(TAG, "onStartCommand: update color");
+                case Constants.ACTION_UPDATE:
                     update(intent);
                     break;
             }
@@ -294,14 +268,14 @@ public class MaskService extends Service {
 
     private void start(Intent intent) {
         Log.i(TAG, "Start Mask");
-        if (mLayout == null) createMaskView(intent);
+        if (mMaskView == null) createMaskView(intent);
 
         createNotification();
-        startForeground(NOTIFICATION_NO, mNoti);
+        startForeground(NOTIFICATION_NO, mNotification);
 
         try {
-            updateLayoutParams(brightness, color);
-            mWindowManager.updateViewLayout(mLayout, mLayoutParams);
+            updateLayoutParams();
+            mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
             isShowing = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -320,12 +294,11 @@ public class MaskService extends Service {
 
     private void update(Intent intent) {
         Log.i(TAG, "Update Mask");
-        brightness = intent.getIntExtra(Constants.EXTRA_BRIGHTNESS, brightness);
-        color = intent.getIntExtra(Constants.EXTRA_COLOR, color);
+        mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
         mAccessibilityManager.isEnabled();
         try {
-            updateLayoutParams(brightness, color);
-            mWindowManager.updateViewLayout(mLayout, mLayoutParams);
+            updateLayoutParams();
+            mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
             isShowing = true;
         } catch (Exception e) {
             e.printStackTrace();

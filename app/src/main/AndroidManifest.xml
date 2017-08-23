@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <application
-        android:name=".BlackbulbApplication"
+        android:name=".ScreenFilterApplication"
         android:allowBackup="true"
         android:fullBackupContent="@xml/full_backup_contents"
         android:icon="@mipmap/ic_launcher"

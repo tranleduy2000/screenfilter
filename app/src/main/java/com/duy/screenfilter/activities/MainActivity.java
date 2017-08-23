@@ -16,9 +16,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -30,7 +27,7 @@ import android.widget.Toast;
 import com.duy.screenfilter.BuildConfig;
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
-import com.duy.screenfilter.adapter.ColorAdapter;
+import com.duy.screenfilter.model.ColorProfile;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
@@ -40,10 +37,9 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 import static com.duy.screenfilter.services.TileReceiver.ACTION_UPDATE_STATUS;
 
-public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener, ColorAdapter.OnColorClickListener {
+public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
     private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
-    public static boolean isRunning = false;
     private static MaterialAnimatedSwitch mSwitch;
     private static final Handler mHandler = new Handler() {
 
@@ -59,8 +55,9 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         }
 
     };
+    public boolean isRunning = false;
     private boolean hasDismissFirstRunDialog = false;
-    private DiscreteSeekBar mSeekbar;
+    private DiscreteSeekBar mColorTemp, mIntensity, mDim;
     private ImageButton mSchedulerBtn;
     private PopupMenu popupMenu;
     private AlertDialog mAlertDialog;
@@ -72,10 +69,9 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         super.onCreate(savedInstanceState);
         mSetting = AppSetting.getInstance(getApplicationContext());
         initWindow();
-        if (mSetting.getBoolean(AppSetting.KEY_DARK_THEME, false)) {
-            setTheme(R.style.AppTheme_Dark);
-        }
+        changeTheme();
         setContentView(R.layout.activity_setting);
+
         View animationView = findViewById(R.id.the_animation);
         animationView.setVisibility(View.INVISIBLE);
         bindView();
@@ -85,7 +81,12 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 startAnimate(true, false);
             }
         });
+    }
 
+    private void changeTheme() {
+        if (mSetting.getBoolean(AppSetting.KEY_DARK_THEME, false)) {
+            setTheme(R.style.AppTheme_Dark);
+        }
     }
 
     private void startAnimate(boolean open, final boolean finish) {
@@ -139,7 +140,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
 
     private void bindView() {
-
         Intent i = new Intent(this, MaskService.class);
         startService(i);
 
@@ -205,35 +205,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             }
         });
 
-        mSeekbar = findViewById(R.id.seek_bar);
-        mSeekbar.setProgress(mSetting.getInt(AppSetting.KEY_BRIGHTNESS, 50));
-        mSeekbar.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
-            int v = -1;
-
-            @Override
-            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-                v = value;
-                if (isRunning) {
-                    Intent intent = new Intent(MainActivity.this, MaskService.class);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE_BRIGHTNESS);
-                    intent.putExtra(Constants.EXTRA_BRIGHTNESS, mSeekbar.getProgress());
-                    intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
-                    startService(intent);
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-                if (v != -1) {
-                    mSetting.putInt(AppSetting.KEY_BRIGHTNESS, v);
-                }
-            }
-        });
+        setupSeekBar();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(MainActivity.this)) {
@@ -301,16 +273,104 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             }
         });
 
-        RecyclerView recyclerView = findViewById(R.id.container_color);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recyclerView.setAdapter(new ColorAdapter(this, this));
-
         FrameLayout rootLayout = findViewById(R.id.root_layout);
         rootLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+    }
+
+    private void setupSeekBar() {
+        mColorTemp = findViewById(R.id.seek_bar_temp);
+        mIntensity = findViewById(R.id.seek_bar_intensity);
+        mDim = findViewById(R.id.seek_bar_dim);
+
+        final ColorProfile colorProfile = mSetting.getColorProfile();
+        mColorTemp.setProgress(colorProfile.getColor());
+        mIntensity.setProgress(colorProfile.getIntensity());
+        mDim.setProgress(colorProfile.getDimLevel());
+
+        mColorTemp.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+            int v = -1;
+
+            @Override
+            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                v = value;
+                if (isRunning) {
+                    colorProfile.setColor(value);
+                    Intent intent = new Intent(MainActivity.this, MaskService.class);
+                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
+                    intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
+                    startService(intent);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+                if (v != -1) {
+                    mSetting.saveColorProfile(colorProfile);
+                }
+            }
+        });
+        mIntensity.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+            int v = -1;
+
+            @Override
+            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                v = value;
+                if (isRunning) {
+                    colorProfile.setIntensity(value);
+                    Intent intent = new Intent(MainActivity.this, MaskService.class);
+                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
+                    intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
+                    startService(intent);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+                if (v != -1) {
+                    mSetting.saveColorProfile(colorProfile);
+                }
+            }
+        });
+        mDim.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
+            int v = -1;
+
+            @Override
+            public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
+                v = value;
+                if (isRunning) {
+                    colorProfile.setDimLevel(value);
+                    Intent intent = new Intent(MainActivity.this, MaskService.class);
+                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
+                    intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
+                    startService(intent);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
+                if (v != -1) {
+                    mSetting.saveColorProfile(colorProfile);
+                }
             }
         });
     }
@@ -339,7 +399,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     @Override
     public void onPause() {
         super.onPause();
-        mSetting.putInt(AppSetting.KEY_BRIGHTNESS, mSeekbar.getProgress());
+        mSetting.putInt(AppSetting.KEY_BRIGHTNESS, mColorTemp.getProgress());
     }
 
     @Override
@@ -369,17 +429,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         return false;
     }
 
-    @Override
-    public void onColorClicked(int color) {
-        mSetting.setFilterColor(color);
-        if (isRunning) {
-            Intent intent = new Intent(this, MaskService.class);
-            intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE_COLOR);
-            intent.putExtra(Constants.EXTRA_COLOR, color);
-            intent.putExtra(Constants.EXTRA_DO_NOT_SEND_CHECK, true);
-            startService(intent);
-        }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -403,6 +452,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     }
 
     public static class MessageReceiver extends BroadcastReceiver {
+        boolean isRunning = true;
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -422,7 +472,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                     }
                     break;
                 case Constants.EVENT_CHECK:
-                    Log.i("C", "Checked" + intent.getBooleanExtra("isShowing", false));
                     if (isRunning = intent.getBooleanExtra("isShowing", false) != mSwitch.isChecked()) {
                         // If I don't use postDelayed, Switch may cause a NPE because its animator wasn't initialized.
                         mHandler.sendEmptyMessageDelayed(1, 100);

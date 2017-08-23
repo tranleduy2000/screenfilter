@@ -6,7 +6,7 @@ public class Constants {
      * Service
      */
     public static final String EXTRA_ACTION = "action";
-    public static final String EXTRA_COLOR = "color";
+    public static final String EXTRA_COLOR_PROFILE = "color";
     public static final String EXTRA_BRIGHTNESS = "brightness";
     public static final String EXTRA_CHECK_FROM_TOGGLE = "check_from_toggle";
     public static final String EXTRA_DO_NOT_SEND_CHECK = "dont_send_check";
@@ -15,7 +15,7 @@ public class Constants {
     public static final String ALARM_ACTION_STOP = "info.papdt.blackbulb.ALARM_ACTION_STOP";
 
     public static final String ACTION_START = "start";
-    public static final String ACTION_UPDATE_BRIGHTNESS = "update_brightness";
+    public static final String ACTION_UPDATE = "update";
     public static final String ACTION_UPDATE_COLOR = "update_color";
     public static final String ACTION_PAUSE = "pause";
     public static final String ACTION_STOP = "stop";

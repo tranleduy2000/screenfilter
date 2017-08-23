@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 
+import com.duy.screenfilter.model.ColorProfile;
+
 public class AppSetting {
     public static final String KEY_BRIGHTNESS = "brightness";
     public static final String KEY_FIRST_RUN = "first_run";
@@ -73,5 +75,22 @@ public class AppSetting {
     public AppSetting setFilterColor(int color) {
         mPrefs.edit().putInt(KEY_COLOR, color).apply();
         return this;
+    }
+
+
+    public ColorProfile getColorProfile() {
+        int colorTemp = getInt("color", 50);
+        int intensity = getInt("intensity", 50);
+        int dim = getInt("dim", 50);
+        boolean lowerBrightness = false;
+        return new ColorProfile(colorTemp, intensity, dim, lowerBrightness);
+    }
+
+    public void saveColorProfile(ColorProfile colorProfile) {
+        if (colorProfile != null) {
+            putInt("color", colorProfile.getColor());
+            putInt("intensity", colorProfile.getIntensity());
+            putInt("dim", colorProfile.getDimLevel());
+        }
     }
 }
