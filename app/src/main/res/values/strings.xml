@@ -38,5 +38,7 @@
     <string name="color_temperature">Color temperature</string>
 	<string name="dim_level">Dim level</string>
 	<string name="insensiti">Insensity</string>
+    <string name="reading_mode">Reading mode</string>
+	<string name="dim_mode">Dim mode</string>
 
 </resources>

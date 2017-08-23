@@ -4,8 +4,6 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -23,7 +21,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.duy.screenfilter.BuildConfig;
 import com.duy.screenfilter.Constants;
@@ -36,15 +33,14 @@ import com.github.glomadrian.materialanimatedswitch.MaterialAnimatedSwitch;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
-import java.util.Locale;
-
 import static com.duy.screenfilter.services.TileReceiver.ACTION_UPDATE_STATUS;
 
 public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
     private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
-    private static MaterialAnimatedSwitch mSwitch;
-    private static final Handler mHandler = new Handler() {
+    public boolean isRunning = false;
+    private MaterialAnimatedSwitch mSwitch;
+    private final Handler mHandler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
@@ -58,7 +54,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         }
 
     };
-    public boolean isRunning = false;
     private boolean hasDismissFirstRunDialog = false;
     private DiscreteSeekBar mColorTemp, mIntensity, mDim;
     private ImageButton mSchedulerBtn;
@@ -310,7 +305,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                     intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
                     startService(intent);
                 }
-                txtColorTemp.setText(String.format(Locale.US, "%x/%x", 500 + value * 30, 3500));
+                txtColorTemp.setText((500 + value * 30f) + "k/3500k");
             }
 
             @Override
@@ -386,7 +381,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setNavigationBarColor(Color.TRANSPARENT);
-
     }
 
     private void showSchedulerDialog() {
@@ -405,7 +399,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     @Override
     public void onPause() {
         super.onPause();
-        mSetting.putInt(AppSetting.KEY_BRIGHTNESS, mColorTemp.getProgress());
     }
 
     @Override
@@ -418,19 +411,31 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     @Override
     public boolean onMenuItemClick(final MenuItem menuItem) {
         int id = menuItem.getItemId();
-        if (id == R.id.action_dark_theme) {
-            mSetting.putBoolean(AppSetting.KEY_DARK_THEME, !menuItem.isChecked());
-            menuItem.setChecked(!menuItem.isChecked());
-            recreate();
-            return true;
-        } else if (id == R.id.action_playstore) {
-            try {
-                Intent intent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID));
-                startActivity(intent);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        switch (id) {
+            case R.id.action_dark_theme:
+                mSetting.putBoolean(AppSetting.KEY_DARK_THEME, !menuItem.isChecked());
+                menuItem.setChecked(!menuItem.isChecked());
+                recreate();
+                return true;
+            case R.id.action_playstore:
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID));
+                    startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case R.id.action_reading_mode:
+                mColorTemp.setProgress(20);
+                mIntensity.setProgress(60);
+                mDim.setProgress(78);
+                break;
+            case R.id.action_dim_mode:
+                mColorTemp.setProgress(0);
+                mIntensity.setProgress(0);
+                mDim.setProgress(60);
+                break;
         }
         return false;
     }
@@ -457,35 +462,5 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         }, 500);
     }
 
-    public static class MessageReceiver extends BroadcastReceiver {
-        boolean isRunning = true;
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (mSwitch == null) return;
-            int eventId = intent.getIntExtra(Constants.EXTRA_EVENT_ID, -1);
-            switch (eventId) {
-                case Constants.EVENT_CANNOT_START:
-                    // Receive a error from MaskService
-                    isRunning = false;
-                    mSwitch.toggle();
-                    Toast.makeText(context, R.string.mask_fail_to_start, Toast.LENGTH_LONG).show();
-                    break;
-                case Constants.EVENT_DESTORY_SERVICE:
-                    if (isRunning) {
-                        mSwitch.toggle();
-                        isRunning = false;
-                    }
-                    break;
-                case Constants.EVENT_CHECK:
-                    if (isRunning = intent.getBooleanExtra("isShowing", false) != mSwitch.isChecked()) {
-                        // If I don't use postDelayed, Switch may cause a NPE because its animator wasn't initialized.
-                        mHandler.sendEmptyMessageDelayed(1, 100);
-                    }
-                    break;
-            }
-        }
-
-    }
 
 }

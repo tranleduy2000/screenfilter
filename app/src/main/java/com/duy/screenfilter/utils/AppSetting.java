@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import com.duy.screenfilter.model.ColorProfile;
 
 public class AppSetting {
-    public static final String KEY_BRIGHTNESS = "brightness";
     public static final String KEY_FIRST_RUN = "first_run";
     public static final String KEY_DARK_THEME = "dark_theme";
     public static final String KEY_AUTO_MODE = "auto_mode";
@@ -14,7 +13,6 @@ public class AppSetting {
     public static final String KEY_MINUTES_SUNRISE = "min_sunrise";
     public static final String KEY_HOURS_SUNSET = "hrs_sunset";
     public static final String KEY_MINUTES_SUNSET = "min_sunset";
-    public static final String KEY_COLOR = "color";
     private static final String PREF_NAME = "setting";
     private static final String TAG = "AppSetting";
     private volatile static AppSetting sInstance;
@@ -68,11 +66,10 @@ public class AppSetting {
     }
 
 
-
     public ColorProfile getColorProfile() {
-        int colorTemp = getInt("color", 50);
-        int intensity = getInt("intensity", 50);
-        int dim = getInt("dim", 50);
+        int colorTemp = getInt("color", 10);
+        int intensity = getInt("intensity", 30);
+        int dim = getInt("dim", 40);
         boolean lowerBrightness = false;
         return new ColorProfile(colorTemp, intensity, dim, lowerBrightness);
     }
