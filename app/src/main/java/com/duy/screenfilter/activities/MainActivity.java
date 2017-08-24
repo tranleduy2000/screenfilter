@@ -3,7 +3,6 @@ package com.duy.screenfilter.activities;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,6 +17,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -211,16 +211,38 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(MainActivity.this)) {
-                Uri uri = Uri.parse("package:" + getPackageName());
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
-                startActivityForResult(intent, REQUEST_OVERLAY_PERMISSION);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.need_permission)
+                        .setMessage(R.string.msg_draw_permission)
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Uri uri = Uri.parse("package:" + getPackageName());
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
+                                startActivityForResult(intent, REQUEST_OVERLAY_PERMISSION);
+                            }
+                        })
+                        .create()
+                        .show();
             }
+            return;
         }
         if (CurrentAppMonitoringThread.getCurrentAppUsingUsageStats(this) == null) {
-            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-            startActivityForResult(intent, REQUEST_USAGE_ACCESS);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.need_permission)
+                    .setMessage(R.string.msg_auto_suspend)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                            startActivityForResult(intent, REQUEST_USAGE_ACCESS);
+                        }
+                    })
+                    .create()
+                    .show();
         }
     }
+
 
     private void setupSchedulerDialog() {
         mSchedulerBtn = findViewById(R.id.btn_scheduler);
@@ -459,7 +481,13 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (Settings.canDrawOverlays(this)) {
                     refresh();
+                } else {
+                    finish();
                 }
+            }
+        } else if (requestCode == REQUEST_USAGE_ACCESS) {
+            if (CurrentAppMonitoringThread.getCurrentAppUsingUsageStats(this) == null) {
+                finish();
             }
         }
     }
@@ -488,14 +516,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                         case Constants.ACTION_START:
                             if (!mSwitch.isChecked()) mSwitch.setChecked(true);
                             break;
-                        case Constants.ACTION_PAUSE:
-                            if (mSwitch.isChecked()) mSwitch.setChecked(false);
-                            break;
                         case Constants.ACTION_STOP:
                             if (mSwitch.isChecked()) mSwitch.setChecked(false);
-                            break;
-                        case Constants.ACTION_UPDATE:
-                            if (!mSwitch.isChecked()) mSwitch.setChecked(true);
                             break;
                     }
                 }

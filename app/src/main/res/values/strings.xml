@@ -31,6 +31,9 @@
     <string name="reading_mode">Reading mode</string>
     <string name="dim_mode">Dim mode</string>
     <string name="mode">Mode</string>
+    <string name="msg_draw_permission">You need to grant permission for the application to draw on your screen.</string>
+    <string name="need_permission">Need permission</string>
+    <string name="msg_auto_suspend">In some cases, you can not press the \"Install\" button or dialogs asking for \"Permission\". You need to grant this permission to the application so that it can be automatically disabled.</string>
 
 
 </resources>

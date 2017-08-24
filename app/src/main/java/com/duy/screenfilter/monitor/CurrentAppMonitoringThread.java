@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Build;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.services.MaskService;
@@ -103,7 +102,6 @@ public class CurrentAppMonitoringThread extends Thread {
         while (running.get()) {
             try {
                 String currentApp = getCurrentApp(mContext);
-                Log.d(TAG, "run currentApp = " + currentApp);
                 if (isAppSecured(currentApp)) {
                     if (running.get() && !isLastSecuredApp) {
                         ActionReceiver.pauseService(mContext);
