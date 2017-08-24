@@ -16,8 +16,10 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
@@ -78,9 +80,43 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         animationView.post(new Runnable() {
             @Override
             public void run() {
-                startAnimate(true, false);
+                startAnimate();
             }
         });
+    }
+
+    private void closeAnimate(int x, int y) {
+        final View view = findViewById(R.id.the_animation);
+        int cx = x == -1 ? view.getWidth() / 2 : x;
+        int cy = y == -1 ? view.getHeight() / 2 : y;
+        int radius = (int) Math.hypot(cx, cy);
+        Animator animator;
+        animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, radius, 0);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                isAnimateRunning = true;
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                view.setVisibility(View.INVISIBLE);
+                MainActivity.super.finish();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+        animator.start();
+
     }
 
     private void changeTheme() {
@@ -89,47 +125,21 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         }
     }
 
-    private void startAnimate(boolean open, final boolean finish) {
+    private void startAnimate() {
         View view = findViewById(R.id.the_animation);
         int cx = view.getWidth() / 2;
         int cy = view.getHeight() / 2;
         int radius = (int) Math.hypot(cx, cy);
         Animator animator;
-        if (open) {
-            animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, radius);
-            findViewById(R.id.the_animation).setVisibility(View.VISIBLE);
-        } else {
-            animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, radius, 0);
-            animator.addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animator) {
-                    isAnimateRunning = true;
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    findViewById(R.id.root_layout).setVisibility(View.INVISIBLE);
-                    if (finish) MainActivity.super.finish();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-
-                }
-            });
-        }
+        animator = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, radius);
+        findViewById(R.id.the_animation).setVisibility(View.VISIBLE);
         animator.start();
     }
 
     @Override
     public void finish() {
         if (!isAnimateRunning) {
-            startAnimate(false, true);
+            closeAnimate(-1, -1);
         }
     }
 
@@ -164,8 +174,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(MainActivity.this)) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
+                Uri uri = Uri.parse("package:" + getPackageName());
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
                 startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
             }
         }
@@ -187,10 +197,14 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
 //        setupScheduler();
         FrameLayout rootLayout = findViewById(R.id.root_layout);
-        rootLayout.setOnClickListener(new View.OnClickListener() {
+        rootLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                finish();
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    closeAnimate((int) motionEvent.getX(), (int) motionEvent.getY());
+                    return true;
+                }
+                return false;
             }
         });
     }
@@ -266,6 +280,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         final ColorProfile colorProfile = mSetting.getColorProfile();
         mColorTemp.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             int v = -1;
+
             @SuppressLint("SetTextI18n")
             @Override
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
@@ -373,18 +388,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mSwitch = null;
-    }
-
-
-    @Override
     public boolean onMenuItemClick(final MenuItem menuItem) {
         int id = menuItem.getItemId();
         switch (id) {
@@ -395,19 +398,19 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 return true;
             case R.id.action_playstore:
                 try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID));
+                    Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                     startActivity(intent);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
-            case R.id.action_reading_mode:
+            case R.id.action_reading_mode: //20 60 78
                 mColorTemp.setProgress(20);
                 mIntensity.setProgress(60);
                 mDim.setProgress(78);
                 break;
-            case R.id.action_dim_mode:
+            case R.id.action_dim_mode: //0 0 60
                 mColorTemp.setProgress(0);
                 mIntensity.setProgress(0);
                 mDim.setProgress(60);
