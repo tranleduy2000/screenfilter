@@ -6,7 +6,9 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"/>
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions"/>
 
     <application
         android:name=".ScreenFilterApplication"
@@ -27,8 +29,7 @@
             android:stateNotNeeded="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
-
+                <!--<action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>-->
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
@@ -40,9 +41,9 @@
                 <action android:name="com.duy.screenfilter.ACTION_UPDATE_FROM_NOTIFICATION"/>
             </intent-filter>
 
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts"/>
+            <!--<meta-data-->
+            <!--android:name="android.app.shortcuts"-->
+            <!--android:resource="@xml/shortcuts"/>-->
         </activity>
 
         <service
@@ -52,7 +53,7 @@
             android:name=".receivers.ActionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.duy.screenfilter.ACTION_UPDATE_FROM_NOTIFICATION"/>
+                <action android:name="com.duy.screenfilter.ACTION_UPDATE_STATUS"/>
                 <action android:name="com.duy.screenfilter.ALARM_ACTION_START"/>
                 <action android:name="com.duy.screenfilter.ALARM_ACTION_STOP"/>
             </intent-filter>
