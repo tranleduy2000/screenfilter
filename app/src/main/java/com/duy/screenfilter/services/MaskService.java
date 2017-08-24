@@ -1,6 +1,5 @@
 package com.duy.screenfilter.services;
 
-import android.animation.Animator;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -30,7 +29,7 @@ import static android.view.WindowManager.LayoutParams;
 
 public class MaskService extends Service implements ServiceController {
 
-    private static final int ANIMATE_DURATION_MILES = 250;
+    private static final int ANIMATE_DURATION_MILES = 1000;
     private static final int NOTIFICATION_NO = 1024;
     private static final String TAG = "MaskService";
 
@@ -97,9 +96,11 @@ public class MaskService extends Service implements ServiceController {
             mMaskView.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
+            mMaskView.setProfile(mColorProfile);
+            mMaskView.animate().alpha(1).setDuration(ANIMATE_DURATION_MILES).start();
+        } else {
+            mMaskView.setProfile(mColorProfile);
         }
-        Log.d(TAG, "updateLayoutParams: " + mColorProfile);
-        mMaskView.setProfile(mColorProfile);
     }
 
     private void destroyMaskView() {
@@ -108,32 +109,8 @@ public class MaskService extends Service implements ServiceController {
         if (mMaskView != null) {
             mMaskView.animate()
                     .alpha(0f)
-                    .setDuration(ANIMATE_DURATION_MILES)
-                    .setListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animator) {
-                            try {
-                                mWindowManager.removeViewImmediate(mMaskView);
-                                mMaskView = null;
-                            } catch (Exception ignored) {
-                            }
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animator) {
-
-                        }
-                    });
+                    .setDuration(ANIMATE_DURATION_MILES).start();
+            mMaskView = null;
         }
     }
 
