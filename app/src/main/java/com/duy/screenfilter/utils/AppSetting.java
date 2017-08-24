@@ -90,6 +90,7 @@ public class AppSetting {
     }
 
     public boolean isSecureSuspend() {
-        return getBoolean("secure_suspend", false);
+//        return getBoolean("secure_suspend", false);
+        return true;
     }
 }

@@ -53,6 +53,8 @@ public class ActionReceiver extends BroadcastReceiver {
                 case Constants.ACTION_STOP:
                     stopService(context);
                     break;
+                case Constants.ACTION_UPDATE:
+                    break;
             }
         } else if (Constants.ALARM_ACTION_START.equals(intent.getAction())) {
             startService(context);
@@ -61,4 +63,7 @@ public class ActionReceiver extends BroadcastReceiver {
         }
     }
 
+    public static void resumeService(Context context) {
+
+    }
 }

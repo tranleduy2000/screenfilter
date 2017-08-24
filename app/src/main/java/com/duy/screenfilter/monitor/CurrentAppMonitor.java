@@ -8,6 +8,7 @@ import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.utils.AppSetting;
 
 /**
@@ -16,15 +17,15 @@ import com.duy.screenfilter.utils.AppSetting;
 
 public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListener {
     private static final String TAG = "CurrentAppMonitor";
-    private Context mContext;
+    private MaskService mMaskService;
     private PowerManager mPowerManager;
     private boolean isMonitoring = false;
     private ScreenStateReceiver mScreenStateReceiver = new ScreenStateReceiver(this);
     @Nullable
     private CurrentAppMonitoringThread mCamThread;
 
-    public CurrentAppMonitor(Context context) {
-        this.mContext = context;
+    public CurrentAppMonitor(MaskService context) {
+        this.mMaskService = context;
         this.mPowerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
     }
 
@@ -47,7 +48,7 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
 
     private void startCamThread() {
         if (mCamThread == null && isScreenOn()) {
-            mCamThread = new CurrentAppMonitoringThread(mContext);
+            mCamThread = new CurrentAppMonitoringThread(mMaskService);
             mCamThread.start();
         }
     }
@@ -55,7 +56,6 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
     @Override
     public void onScreenTurnOff() {
         Log.d(TAG, "onScreenTurnOff() called");
-
         if (mCamThread != null) {
             mCamThread.interrupt();
             mCamThread = null;
@@ -63,7 +63,8 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
     }
 
     public void start() {
-        AppSetting appSetting = AppSetting.getInstance(mContext);
+        Log.d(TAG, "start() called " + isMonitoring                 );
+        AppSetting appSetting = AppSetting.getInstance(mMaskService);
         if (appSetting.isSecureSuspend()) {
             if (isMonitoring) {
                 Log.d(TAG, "start isMonitoring = " + isMonitoring);
@@ -71,7 +72,7 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
                 IntentFilter intentFilter = new IntentFilter();
                 intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
                 intentFilter.addAction(Intent.ACTION_SCREEN_ON);
-                mContext.registerReceiver(mScreenStateReceiver, intentFilter);
+                mMaskService.registerReceiver(mScreenStateReceiver, intentFilter);
                 isMonitoring = true;
                 startCamThread();
             }
@@ -85,7 +86,7 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
             Log.d(TAG, "stop: stop");
             startCamThread();
             try {
-                mContext.unregisterReceiver(mScreenStateReceiver);
+                mMaskService.unregisterReceiver(mScreenStateReceiver);
             } catch (Exception ignored) {
             }
             isMonitoring = false;

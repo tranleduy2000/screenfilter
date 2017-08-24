@@ -35,6 +35,7 @@ import com.duy.screenfilter.BuildConfig;
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.model.ColorProfile;
+import com.duy.screenfilter.monitor.CurrentAppMonitoringThread;
 import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.ui.SchedulerDialog;
@@ -45,7 +46,9 @@ import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
 public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
 
-    private static final int OVERLAY_PERMISSION_REQ_CODE = 1001;
+    private static final int REQUEST_OVERLAY_PERMISSION = 1001;
+    private static final int REQUEST_USAGE_ACCESS = 1002;
+
     private static final String TAG = "MainActivity";
     public boolean isRunning = false;
     private Switch mSwitch;
@@ -87,6 +90,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 startAnimate();
             }
         });
+
+        checkPermission();
     }
 
     private void closeAnimate(int x, int y) {
@@ -172,15 +177,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             }
         });
         setupSeekBar();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(MainActivity.this)) {
-                Uri uri = Uri.parse("package:" + getPackageName());
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
-                startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-            }
-        }
-
         ImageButton menuBtn = findViewById(R.id.btn_menu);
         final PopupMenu popupMenu = new PopupMenu(this, menuBtn);
         popupMenu.getMenuInflater().inflate(R.menu.menu_settings, popupMenu.getMenu());
@@ -208,6 +204,21 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 return false;
             }
         });
+
+    }
+
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(MainActivity.this)) {
+                Uri uri = Uri.parse("package:" + getPackageName());
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
+                startActivityForResult(intent, REQUEST_OVERLAY_PERMISSION);
+            }
+        }
+        if (CurrentAppMonitoringThread.getCurrentAppUsingUsageStats(this) == null) {
+            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+            startActivityForResult(intent, REQUEST_USAGE_ACCESS);
+        }
     }
 
     private void setupSchedulerDialog() {
@@ -439,7 +450,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+        if (requestCode == REQUEST_OVERLAY_PERMISSION) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (Settings.canDrawOverlays(this)) {
                     refresh();

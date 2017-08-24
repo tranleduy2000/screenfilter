@@ -48,6 +48,7 @@ public class MaskService extends Service implements ServiceController {
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
     private ColorProfile mColorProfile = null;
+    private boolean pause;
 
     @Override
     public void onCreate() {
@@ -299,6 +300,10 @@ public class MaskService extends Service implements ServiceController {
     @Override
     public boolean onUnbind(Intent intent) {
         return super.onUnbind(intent);
+    }
+
+    public boolean isPause() {
+        return pause;
     }
 
     public class MaskBinder extends Binder {
