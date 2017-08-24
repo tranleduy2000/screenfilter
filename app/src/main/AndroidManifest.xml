@@ -42,9 +42,9 @@
             android:name=".services.TileReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="info.papdt.blackbulb.ACTION_UPDATE_STATUS"/>
-                <action android:name="info.papdt.blackbulb.ALARM_ACTION_START"/>
-                <action android:name="info.papdt.blackbulb.ALARM_ACTION_STOP"/>
+                <action android:name="com.duy.screenfilter.ACTION_UPDATE_STATUS"/>
+                <action android:name="com.duy.screenfilter.ALARM_ACTION_START"/>
+                <action android:name="com.duy.screenfilter.ALARM_ACTION_STOP"/>
             </intent-filter>
         </receiver>
 
