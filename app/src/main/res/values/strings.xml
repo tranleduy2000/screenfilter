@@ -1,46 +1,35 @@
-<resources
-	xmlns:tools="http://schemas.android.com/tools"
-	tools:ignore="MissingTranslation" >
+<resources>
 
-	<string name="app_name">Screen Filter</string>
+    <string name="app_name">Screen Filter</string>
+    <string name="shortcut_label_switch">Toggle</string>
+    <string name="action_dark_theme">Dark theme</string>
+    <string name="mask_fail_to_start">Failed to start mask. Please check whether the system has denied the permissions.</string>
 
-	<string name="shortcut_label_switch">Toggle</string>
+    <string name="dialog_first_run_title">First run</string>
+    <string name="dialog_first_run_message">Can you see this message? If you can, ScreenFilter is working well.\nIt will automatically stop after 5 seconds if you don\'t press OK.</string>
 
-	<string name="action_dark_theme">Dark theme</string>
+    <string name="notification_running_title">ScreenFilter is working</string>
+    <string name="notification_running_msg">Click here to open settings</string>
 
-	<string name="mask_fail_to_start">Failed to start mask. Please check whether the system has denied the permissions.</string>
+    <string name="notification_paused_title">ScreenFilter is paused</string>
+    <string name="notification_paused_msg">Click here to open settings or Swipe to stop ScreenFilter</string>
 
-	<string name="dialog_first_run_title">First run</string>
-	<string name="dialog_first_run_message">Can you see this message? If you can, ScreenFilter is working well.\nIt will automatically stop after 5 seconds if you don\'t press OK.</string>
+    <string name="notification_action_turn_off">Turn off</string>
+    <string name="notification_action_turn_on">Turn on</string>
 
-	<string name="notification_running_title">ScreenFilter is working</string>
-	<string name="notification_running_msg">Click here to open settings</string>
+    <string name="scheduler_title">Auto mode</string>
+    <string name="turn_off_at">Turn off at</string>
+    <string name="turn_on_at">Turn on at</string>
 
-	<string name="notification_paused_title">ScreenFilter is paused</string>
-	<string name="notification_paused_msg">Click here to open settings or Swipe to stop ScreenFilter</string>
-
-	<string name="notification_action_turn_off">Turn off</string>
-	<string name="notification_action_turn_on">Turn on</string>
-
-	<string name="mode_text_normal">Normal Mode</string>
-	<string name="mode_text_overlay_all">Overlay System Mode</string>
-
-	<string name="mode_desc_no_permission">Recommended mode. It is stable, although it cannot dim navigation bar and prevent user from clicking \"Install\" or \"Allow\" in permission dialog.</string>
-	<string name="mode_desc_normal">Recommended mode. It is stable, although it cannot dim navigation bar and prevent user from clicking \"Install\" or \"Allow\" in permission dialog.</string>
-	<string name="mode_desc_overlay_all">You can dim both status bar and navigation bar. However, it may make screen flashing in some apps.</string>
-
-	<string name="scheduler_title">Auto mode</string>
-
-	<string name="dialog_ignore_battery_opt_title">Tips</string>
-	<string name="dialog_ignore_battery_opt_msg">It may not automatically activate/deactivate on time because of Android 6.0 Doze mode. If you have any problem, try to request system to ignore battery optimization.</string>
-	<string name="dialog_button_go_to_set">Go to set</string>
+    <string name="dialog_ignore_battery_opt_title">Tips</string>
+    <string name="dialog_ignore_battery_opt_msg">It may not automatically activate/deactivate on time because of Android 6.0 Doze mode. If you have any problem, try to request system to ignore battery optimization.</string>
+    <string name="dialog_button_go_to_set">Go to set</string>
     <string name="play_store">Goto Play Store</string>
     <string name="color_temperature">Color temperature</string>
-	<string name="dim_level">Dim level</string>
-	<string name="insensiti">Insensity</string>
+    <string name="dim_level">Dim level</string>
+    <string name="intensity">Intensity</string>
     <string name="reading_mode">Reading mode</string>
-	<string name="dim_mode">Dim mode</string>
-    <string name="turn_off_at">Turn off at</string>
-	<string name="turn_on_at">Turn on at</string>
+    <string name="dim_mode">Dim mode</string>
+
 
 </resources>

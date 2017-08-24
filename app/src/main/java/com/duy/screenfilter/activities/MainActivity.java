@@ -476,11 +476,27 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             if (intent != null) {
                 if (intent.getAction().equals(Constants.ALARM_ACTION_START)) {
                     if (!mSwitch.isChecked()) {
-                        mSwitch.toggle();
+                        mSwitch.setChecked(true);
                     }
                 } else if (intent.getAction().equals(Constants.ALARM_ACTION_STOP)) {
                     if (mSwitch.isChecked()) {
-                        mSwitch.toggle();
+                        mSwitch.setChecked(false);
+                    }
+                } else if (intent.getAction().equals(ActionReceiver.ACTION_UPDATE_STATUS)) {
+                    String action = intent.getStringExtra(Constants.EXTRA_ACTION);
+                    switch (action) {
+                        case Constants.ACTION_START:
+                            if (!mSwitch.isChecked()) mSwitch.setChecked(true);
+                            break;
+                        case Constants.ACTION_PAUSE:
+                            if (mSwitch.isChecked()) mSwitch.setChecked(false);
+                            break;
+                        case Constants.ACTION_STOP:
+                            if (mSwitch.isChecked()) mSwitch.setChecked(false);
+                            break;
+                        case Constants.ACTION_UPDATE:
+                            if (!mSwitch.isChecked()) mSwitch.setChecked(true);
+                            break;
                     }
                 }
             }

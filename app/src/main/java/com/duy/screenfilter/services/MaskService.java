@@ -62,9 +62,9 @@ public class MaskService extends Service implements ServiceController {
     }
 
     private void createMaskView(Intent startIntent) {
-        mColorProfile = (ColorProfile) startIntent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
-        updateLayoutParams();
         try {
+            mColorProfile = (ColorProfile) startIntent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
+            updateLayoutParams();
             mWindowManager.addView(mMaskView, mLayoutParams);
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,7 +97,7 @@ public class MaskService extends Service implements ServiceController {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
             mMaskView.setProfile(mColorProfile);
-            mMaskView.animate().alpha(1).setDuration(ANIMATE_DURATION_MILES).start();
+
         } else {
             mMaskView.setProfile(mColorProfile);
         }
@@ -116,6 +116,7 @@ public class MaskService extends Service implements ServiceController {
 
     private Notification createRunningNotification() {
         Log.i(TAG, "Create running notification");
+
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent pauseIntent = new Intent();
         pauseIntent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
@@ -127,12 +128,14 @@ public class MaskService extends Service implements ServiceController {
                 getString(R.string.notification_action_turn_off),
                 PendingIntent.getBroadcast(getBaseContext(), 0, pauseIntent, Intent.FILL_IN_DATA));
 
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, openIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
         return new Notification.Builder(getApplicationContext())
                 .setContentTitle(getString(R.string.notification_running_title))
                 .setContentText(getString(R.string.notification_running_msg))
                 .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
                 .addAction(pauseAction)
-                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentIntent(resultPendingIntent)
                 .setAutoCancel(false)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
@@ -214,13 +217,15 @@ public class MaskService extends Service implements ServiceController {
 
     public void start(@Nullable Intent intent) {
         if (!isShowing) {
-            Log.d(TAG, "start() called with: intent = [" + intent + "]");
-            if (mMaskView == null) createMaskView(intent);
-            startForeground(NOTIFICATION_NO, createRunningNotification());
-            mCurrentAppMonitor.start();
             try {
+                createMaskView(intent);
+
+                startForeground(NOTIFICATION_NO, createRunningNotification());
+                mCurrentAppMonitor.start();
+
                 updateLayoutParams();
                 mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
+
                 isShowing = true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -235,11 +240,12 @@ public class MaskService extends Service implements ServiceController {
         stopForeground(true);
         destroyMaskView();
         showPausedNotification();
+        mCurrentAppMonitor.stop();
         isShowing = false;
     }
 
-    public void update(Intent intent) {
-        Log.i(TAG, "Update Mask");
+    public void update(Intent intent) {Log.i(TAG, "Update Mask");
+
         mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
 
         try {

@@ -2,6 +2,7 @@ package com.duy.screenfilter;
 
 import android.app.Application;
 
+import com.duy.screenfilter.utils.AppSetting;
 import com.duy.screenfilter.utils.Utility;
 
 public class ScreenFilterApplication extends Application {
@@ -10,6 +11,7 @@ public class ScreenFilterApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Utility.updateAlarmSettings(this);
+        AppSetting.getInstance(this);
     }
 
 }

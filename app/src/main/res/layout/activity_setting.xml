@@ -119,7 +119,7 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
                 android:paddingStart="16dp"
-                android:text="@string/insensiti"/>
+                android:text="@string/intensity"/>
 
             <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
                 android:id="@+id/seek_bar_intensity"
