@@ -39,9 +39,6 @@ public class MaskService extends Service implements ServiceController {
     private AccessibilityManager mAccessibilityManager;
     private CurrentAppMonitor mCurrentAppMonitor;
 
-
-    private Notification mNotification;
-
     private MaskView mMaskView;
     private LayoutParams mLayoutParams;
 
@@ -148,7 +145,7 @@ public class MaskService extends Service implements ServiceController {
         }
     }
 
-    private void createNotification() {
+    private Notification createRunningNotification() {
         Log.i(TAG, "Create running notification");
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent pauseIntent = new Intent();
@@ -161,7 +158,7 @@ public class MaskService extends Service implements ServiceController {
                 getString(R.string.notification_action_turn_off),
                 PendingIntent.getBroadcast(getBaseContext(), 0, pauseIntent, Intent.FILL_IN_DATA));
 
-        mNotification = new Notification.Builder(getApplicationContext())
+        return new Notification.Builder(getApplicationContext())
                 .setContentTitle(getString(R.string.notification_running_title))
                 .setContentText(getString(R.string.notification_running_msg))
                 .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
@@ -172,11 +169,10 @@ public class MaskService extends Service implements ServiceController {
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
                 .build();
-
     }
 
     // implement pause notification
-    private void createPauseNotification() {
+    private Notification createPauseNotification() {
         Log.i(TAG, "Create paused notification");
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent resumeIntent = new Intent();
@@ -191,7 +187,7 @@ public class MaskService extends Service implements ServiceController {
                 getString(R.string.notification_action_turn_on),
                 PendingIntent.getBroadcast(getBaseContext(), 0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 
-        mNotification = new Notification.Builder(getApplicationContext())
+        return new Notification.Builder(getApplicationContext())
                 .setContentTitle(getString(R.string.notification_paused_title))
                 .setContentText(getString(R.string.notification_paused_msg))
                 .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
@@ -206,8 +202,7 @@ public class MaskService extends Service implements ServiceController {
     }
 
     private void showPausedNotification() {
-        if (mNotification == null) createPauseNotification();
-        mNotificationManager.notify(NOTIFICATION_NO, mNotification);
+        mNotificationManager.notify(NOTIFICATION_NO, createPauseNotification());
     }
 
     private void cancelNotification() {
@@ -252,11 +247,8 @@ public class MaskService extends Service implements ServiceController {
     public void start(@Nullable Intent intent) {
         if (!isShowing) {
             Log.d(TAG, "start() called with: intent = [" + intent + "]");
-            if (mMaskView == null) {
-                createMaskView(intent);
-            }
-            createNotification();
-            startForeground(NOTIFICATION_NO, mNotification);
+            if (mMaskView == null) createMaskView(intent);
+            startForeground(NOTIFICATION_NO, createRunningNotification());
             mCurrentAppMonitor.start();
             try {
                 updateLayoutParams();
@@ -274,7 +266,6 @@ public class MaskService extends Service implements ServiceController {
         Log.i(TAG, "Pause Mask");
         stopForeground(true);
         destroyMaskView();
-        createPauseNotification();
         showPausedNotification();
         isShowing = false;
     }
