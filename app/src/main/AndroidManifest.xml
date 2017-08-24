@@ -18,8 +18,7 @@
         android:label="@string/app_name"
         android:persistent="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Light"
-        tools:ignore="ManifestResource,UnusedAttribute">
+        android:theme="@style/AppTheme.Light">
         <activity
             android:name=".activities.MainActivity"
             android:excludeFromRecents="true"

@@ -209,6 +209,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     }
 
     private void checkPermission() {
+        Log.d(TAG, "checkPermission() called");
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.canDrawOverlays(MainActivity.this)) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -224,8 +226,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                         })
                         .create()
                         .show();
+                return;
             }
-            return;
         }
         if (CurrentAppMonitoringThread.getCurrentAppUsingUsageStats(this) == null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
