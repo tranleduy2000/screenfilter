@@ -96,5 +96,13 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
             isMonitoring = false;
         }
     }
+
+    public boolean isMonitoring() {
+        return isMonitoring;
+    }
+
+    public void pause() {
+
+    }
 }
 

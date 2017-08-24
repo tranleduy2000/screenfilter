@@ -105,7 +105,7 @@ public class CurrentAppMonitoringThread extends Thread {
                 String currentApp = getCurrentApp(mContext);
                 Log.d(TAG, "run currentApp = " + currentApp);
                 if (isAppSecured(currentApp)) {
-                    if (running.get()) {
+                    if (running.get() && !isLastSecuredApp) {
                         ActionReceiver.pauseService(mContext);
                         isLastSecuredApp = true;
                     }

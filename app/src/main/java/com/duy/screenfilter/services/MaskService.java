@@ -44,6 +44,7 @@ public class MaskService extends Service implements ServiceController {
     private MaskBinder mBinder = new MaskBinder();
     private ColorProfile mColorProfile = null;
     private boolean pause;
+    private Status status;
 
     @Override
     public void onCreate() {
@@ -209,9 +210,14 @@ public class MaskService extends Service implements ServiceController {
         stopSelf();
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
     public void start(@Nullable Intent intent) {
         if (!isShowing) {
             try {
+                status = Status.STARTING;
                 createMaskView(intent);
 
                 startForeground(NOTIFICATION_NO, createRunningNotification());
@@ -231,17 +237,18 @@ public class MaskService extends Service implements ServiceController {
 
     public void pause(@Nullable Intent intent) {
         Log.i(TAG, "Pause Mask");
-        stopForeground(true);
-        destroyMaskView();
-        showPausedNotification();
-        mCurrentAppMonitor.stop();
-        isShowing = false;
+        if (status != Status.PAUSED) {
+            status = Status.PAUSED;
+            stopForeground(true);
+            destroyMaskView();
+            showPausedNotification();
+            isShowing = false;
+        }
     }
 
     public void update(Intent intent) {
-        Log.d(TAG, "update() called with: intent = [" + intent + "]");
-
         try {
+            status = Status.UPDATING;
             mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
             if (updateLayoutParams()) {
                 mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
@@ -267,7 +274,7 @@ public class MaskService extends Service implements ServiceController {
         return pause;
     }
 
-    enum Status {STARTED, PAUSED, RUNNING, STOPPED}
+    enum Status {STARTING, PAUSED, UPDATING, STOPPED}
 
     public class MaskBinder extends Binder {
 
