@@ -52,7 +52,7 @@
             android:name=".receivers.ActionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.duy.screenfilter.ACTION_UPDATE_STATUS"/>
+                <action android:name="com.duy.screenfilter.ACTION_UPDATE_FROM_NOTIFICATION"/>
                 <action android:name="com.duy.screenfilter.ALARM_ACTION_START"/>
                 <action android:name="com.duy.screenfilter.ALARM_ACTION_STOP"/>
             </intent-filter>

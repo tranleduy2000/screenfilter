@@ -20,13 +20,11 @@ public class ActionReceiver extends BroadcastReceiver {
         AppSetting settings = AppSetting.getInstance(context);
         Intent intent2 = new Intent(context, MaskService.class);
         intent2.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
-        intent2.putExtra(Constants.EXTRA_COLOR_PROFILE, settings.getColorProfile());
         context.startService(intent2);
     }
 
     public static void stopService(Context context) {
         Log.d(TAG, "stopService() called with: context = [" + context + "]");
-
         Intent intent = new Intent(context, MaskService.class);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
         context.startService(intent);

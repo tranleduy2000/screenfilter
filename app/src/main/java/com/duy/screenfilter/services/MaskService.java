@@ -111,7 +111,6 @@ public class MaskService extends Service implements ServiceController {
         Intent pauseIntent = new Intent();
         pauseIntent.setAction(Constants.ACTION_UPDATE_FROM_NOTIFICATION);
         pauseIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
-        pauseIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 
         Notification.Action pauseAction = new Notification.Action(
                 R.drawable.ic_wb_incandescent_black_24dp,
