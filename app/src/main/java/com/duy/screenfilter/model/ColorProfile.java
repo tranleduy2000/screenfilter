@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by Duy on 23-Aug-17.
  */
 
-public class ColorProfile implements Serializable {
+public class ColorProfile implements Serializable, Cloneable {
     private static final float DIM_MAX_ALPHA = 0.9f;
     private static final float INTENSITY_MAX_ALPHA = 0.75f;
     private static final float ALPHA_ADD_MULTIPLIER = 0.75f;
@@ -136,5 +136,28 @@ public class ColorProfile implements Serializable {
 
     private int getColorTemperature(int color) {
         return 500 + color * 30;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ColorProfile that = (ColorProfile) o;
+
+        if (color != that.color) return false;
+        if (intensity != that.intensity) return false;
+        if (dimLevel != that.dimLevel) return false;
+        return lowerBrightness == that.lowerBrightness;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = color;
+        result = 31 * result + intensity;
+        result = 31 * result + dimLevel;
+        result = 31 * result + (lowerBrightness ? 1 : 0);
+        return result;
     }
 }

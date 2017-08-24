@@ -21,7 +21,6 @@ import com.duy.screenfilter.R;
 import com.duy.screenfilter.activities.MainActivity;
 import com.duy.screenfilter.model.ColorProfile;
 import com.duy.screenfilter.monitor.CurrentAppMonitor;
-import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.utils.Utility;
 import com.duy.screenfilter.view.MaskView;
 
@@ -89,18 +88,14 @@ public class MaskService extends Service implements ServiceController {
             mLayoutParams.format = PixelFormat.TRANSPARENT;
             mLayoutParams.gravity = Gravity.CENTER;
         }
-
-
         if (mMaskView == null) {
             mMaskView = new MaskView(this);
             mMaskView.setLayoutParams(new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
-            mMaskView.setProfile(mColorProfile);
-
-        } else {
-            mMaskView.setProfile(mColorProfile);
         }
+        mMaskView.setProfile(mColorProfile);
+
     }
 
     private void destroyMaskView() {
@@ -119,7 +114,7 @@ public class MaskService extends Service implements ServiceController {
 
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent pauseIntent = new Intent();
-        pauseIntent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
+        pauseIntent.setAction(Constants.ACTION_UPDATE_STATUS);
         pauseIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
         pauseIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 
@@ -147,7 +142,7 @@ public class MaskService extends Service implements ServiceController {
         Log.i(TAG, "Create paused notification");
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent resumeIntent = new Intent();
-        resumeIntent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
+        resumeIntent.setAction(Constants.ACTION_UPDATE_STATUS);
         resumeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
         resumeIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 
@@ -244,16 +239,16 @@ public class MaskService extends Service implements ServiceController {
         isShowing = false;
     }
 
-    public void update(Intent intent) {Log.i(TAG, "Update Mask");
-
-        mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
-
+    public void update(Intent intent) {
+        Log.i(TAG, "Update Mask");
         try {
+            mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
             updateLayoutParams();
             mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
             isShowing = true;
         } catch (Exception e) {
             e.printStackTrace();
+            isShowing = false;
         }
     }
 

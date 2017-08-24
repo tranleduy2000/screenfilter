@@ -109,7 +109,7 @@ public class CurrentAppMonitoringThread extends Thread {
                     }
                 } else {
                     if (running.get()) {
-                        ActionReceiver.startService(mContext);
+                        ActionReceiver.updateService(mContext);
                     }
                 }
                 Thread.sleep(1000);

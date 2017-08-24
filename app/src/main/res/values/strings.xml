@@ -30,6 +30,7 @@
     <string name="intensity">Intensity</string>
     <string name="reading_mode">Reading mode</string>
     <string name="dim_mode">Dim mode</string>
+    <string name="mode">Mode</string>
 
 
 </resources>

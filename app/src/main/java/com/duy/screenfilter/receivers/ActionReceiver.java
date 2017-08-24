@@ -37,10 +37,19 @@ public class ActionReceiver extends BroadcastReceiver {
         context.startService(intent);
     }
 
+
+    public static void updateService(Context context) {
+        AppSetting settings = AppSetting.getInstance(context);
+        Intent intent = new Intent(context, MaskService.class);
+        intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
+        intent.putExtra(Constants.EXTRA_COLOR_PROFILE, settings.getColorProfile());
+        context.startService(intent);
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "received \"" + intent.getAction() + "\" action");
-        if (ACTION_UPDATE_STATUS.equals(intent.getAction())) {
+        if (Constants.ACTION_UPDATE_STATUS.equals(intent.getAction())) {
             String action = intent.getStringExtra(Constants.EXTRA_ACTION);
             switch (action) {
                 case Constants.ACTION_START:
@@ -53,6 +62,7 @@ public class ActionReceiver extends BroadcastReceiver {
                     stopService(context);
                     break;
                 case Constants.ACTION_UPDATE:
+                    updateService(context);
                     break;
             }
         } else if (Constants.ALARM_ACTION_START.equals(intent.getAction())) {
@@ -60,9 +70,5 @@ public class ActionReceiver extends BroadcastReceiver {
         } else if (Constants.ALARM_ACTION_STOP.equals(intent.getAction())) {
             stopService(context);
         }
-    }
-
-    public static void resumeService(Context context) {
-
     }
 }

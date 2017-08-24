@@ -43,6 +43,9 @@ public class MaskView extends View {
 
     public void setProfile(ColorProfile profile) {
         synchronized (mLock) {
+            if (mProfile != null && mProfile.equals(profile)) {
+                return;
+            }
             this.mProfile = profile;
             invalidate();
         }

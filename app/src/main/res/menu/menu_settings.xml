@@ -2,11 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_reading_mode"
-        android:title="@string/reading_mode"/>
-    <item
-        android:id="@+id/action_dim_mode"
-        android:title="@string/dim_mode"/>
+        android:title="@string/mode">
+        <menu>
+            <item
+                android:id="@+id/action_reading_mode"
+                android:title="@string/reading_mode"/>
+            <item
+                android:id="@+id/action_dim_mode"
+                android:title="@string/dim_mode"/>
+        </menu>
+    </item>
+
+
     <item
         android:id="@+id/action_dark_theme"
         android:checkable="true"
