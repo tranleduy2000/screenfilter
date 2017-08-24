@@ -10,6 +10,7 @@ public class Constants {
 
     public static final String ALARM_ACTION_START = "com.duy.screenfilter.ALARM_ACTION_START";
     public static final String ALARM_ACTION_STOP = "com.duy.screenfilter.ALARM_ACTION_STOP";
+    public static final String ACTION_UPDATE_STATUS = "com.duy.screenfilter.ACTION_UPDATE_STATUS";
 
     public static final String ACTION_START = "start";
     public static final String ACTION_UPDATE = "update";

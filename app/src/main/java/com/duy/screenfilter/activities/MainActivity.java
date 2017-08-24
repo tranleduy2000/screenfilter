@@ -36,7 +36,6 @@ import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.model.ColorProfile;
 import com.duy.screenfilter.monitor.CurrentAppMonitoringThread;
-import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
@@ -269,7 +268,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
     private void sendBroadcastStopService() {
         Intent intent = new Intent();
-        intent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
+        intent.setAction(Constants.ACTION_UPDATE_STATUS);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
         sendBroadcast(intent);
         isRunning = false;
@@ -280,7 +279,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         Log.d(TAG, "sendBroadcastStartService() called");
 
         Intent intent = new Intent();
-        intent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
+        intent.setAction(Constants.ACTION_UPDATE_STATUS);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
         sendBroadcast(intent);
         isRunning = true;
@@ -438,7 +437,10 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     @Override
     protected void onResume() {
         super.onResume();
-        IntentFilter intentFilter = new IntentFilter(Constants.ACTION_START);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.ACTION_START);
+        intentFilter.addAction(Constants.ACTION_STOP);
+        intentFilter.addAction(Constants.ACTION_UPDATE_STATUS);
         registerReceiver(mStatusReceiver, intentFilter);
     }
 
@@ -470,9 +472,12 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     }
 
     private class StatusReceiver extends BroadcastReceiver {
+        private static final String TAG = "StatusReceiver";
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive() called with: context = [" + context + "], intent = [" + intent + "]");
+
             if (intent != null) {
                 if (intent.getAction().equals(Constants.ALARM_ACTION_START)) {
                     if (!mSwitch.isChecked()) {
@@ -482,7 +487,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                     if (mSwitch.isChecked()) {
                         mSwitch.setChecked(false);
                     }
-                } else if (intent.getAction().equals(ActionReceiver.ACTION_UPDATE_STATUS)) {
+                } else if (intent.getAction().equals(Constants.ACTION_UPDATE_STATUS)) {
                     String action = intent.getStringExtra(Constants.EXTRA_ACTION);
                     switch (action) {
                         case Constants.ACTION_START:

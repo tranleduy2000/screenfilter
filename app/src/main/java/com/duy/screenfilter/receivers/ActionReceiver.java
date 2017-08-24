@@ -12,7 +12,6 @@ import com.duy.screenfilter.utils.Utility;
 
 public class ActionReceiver extends BroadcastReceiver {
 
-    public static final String ACTION_UPDATE_STATUS = "com.duy.screenfilter.ACTION_UPDATE_STATUS";
     private static final String TAG = "TileReceiver";
 
     public static void pauseService(Context context) {
