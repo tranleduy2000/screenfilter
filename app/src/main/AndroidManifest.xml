@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name=".ScreenFilterApplication"
@@ -26,9 +27,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
+                <action android:name="com.duy.screenfilter.ALARM_ACTION_START"/>
+                <action android:name="com.duy.screenfilter.ALARM_ACTION_STOP"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
 
             <meta-data
                 android:name="android.app.shortcuts"
@@ -39,7 +43,7 @@
             android:name=".services.MaskService"/>
 
         <receiver
-            android:name=".services.TileReceiver"
+            android:name=".receivers.ActionReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.duy.screenfilter.ACTION_UPDATE_STATUS"/>

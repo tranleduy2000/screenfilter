@@ -58,10 +58,10 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
 
     private void init() {
         mSettings = AppSetting.getInstance(getContext());
-        hrsSunrise = mSettings.getInt(AppSetting.KEY_HOURS_SUNRISE, 6);
-        minSunrise = mSettings.getInt(AppSetting.KEY_MINUTES_SUNRISE, 0);
-        hrsSunset = mSettings.getInt(AppSetting.KEY_HOURS_SUNSET, 22);
-        minSunset = mSettings.getInt(AppSetting.KEY_MINUTES_SUNSET, 0);
+        hrsSunrise = mSettings.getInt(AppSetting.KEY_HOURS_STOP, 6);
+        minSunrise = mSettings.getInt(AppSetting.KEY_MINUTES_STOP, 0);
+        hrsSunset = mSettings.getInt(AppSetting.KEY_HOURS_START, 22);
+        minSunset = mSettings.getInt(AppSetting.KEY_MINUTES_START, 0);
 
         View rootView = getLayoutInflater().inflate(R.layout.dialog_scheduler, null);
         setView(rootView);
@@ -141,14 +141,14 @@ public class SchedulerDialog extends AlertDialog implements TimePickerDialog.OnT
             hrsSunrise = hourOfDay;
             minSunrise = minute;
             sunriseTime.setText(String.format(Locale.getDefault(), "%1$02d:%2$02d", hrsSunrise, minSunrise));
-            mSettings.putInt(AppSetting.KEY_HOURS_SUNRISE, hrsSunrise);
-            mSettings.putInt(AppSetting.KEY_MINUTES_SUNRISE, minSunrise);
+            mSettings.putInt(AppSetting.KEY_HOURS_STOP, hrsSunrise);
+            mSettings.putInt(AppSetting.KEY_MINUTES_STOP, minSunrise);
         } else if (view == sunsetPicker) {
             hrsSunset = hourOfDay;
             minSunset = minute;
             sunsetTime.setText(String.format(Locale.getDefault(), "%1$02d:%2$02d", hrsSunset, minSunset));
-            mSettings.putInt(AppSetting.KEY_HOURS_SUNSET, hrsSunset);
-            mSettings.putInt(AppSetting.KEY_MINUTES_SUNSET, minSunset);
+            mSettings.putInt(AppSetting.KEY_HOURS_START, hrsSunset);
+            mSettings.putInt(AppSetting.KEY_MINUTES_START, minSunset);
         }
         Utility.updateAlarmSettings(getContext());
     }

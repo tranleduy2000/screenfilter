@@ -47,14 +47,12 @@ public class Utility {
 
 
     public static void updateAlarmSettings(Context context) {
-        if (true) return;
-
         AppSetting settings = AppSetting.getInstance(context);
         if (settings.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
-            int hrsSunrise = settings.getInt(AppSetting.KEY_HOURS_SUNRISE, 6);
-            int minSunrise = settings.getInt(AppSetting.KEY_MINUTES_SUNRISE, 0);
-            int hrsSunset = settings.getInt(AppSetting.KEY_HOURS_SUNSET, 22);
-            int minSunset = settings.getInt(AppSetting.KEY_MINUTES_SUNSET, 0);
+            int hrsSunrise = settings.getInt(AppSetting.KEY_HOURS_STOP, 6);
+            int minSunrise = settings.getInt(AppSetting.KEY_MINUTES_STOP, 0);
+            int hrsSunset = settings.getInt(AppSetting.KEY_HOURS_START, 22);
+            int minSunset = settings.getInt(AppSetting.KEY_MINUTES_START, 0);
 
             Calendar now = Calendar.getInstance();
             Calendar sunriseCalendar = (Calendar) now.clone();
@@ -116,7 +114,6 @@ public class Utility {
     public static boolean isScreenFilterServiceRunning(Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            Log.d(TAG, "isScreenFilterServiceRunning: " + service.service.getClassName());
             if (MaskService.class.getName().equals(service.service.getClassName())) {
                 return true;
             }

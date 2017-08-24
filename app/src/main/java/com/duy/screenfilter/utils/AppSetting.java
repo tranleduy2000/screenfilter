@@ -9,10 +9,13 @@ public class AppSetting {
     public static final String KEY_FIRST_RUN = "first_run";
     public static final String KEY_DARK_THEME = "dark_theme";
     public static final String KEY_AUTO_MODE = "auto_mode";
-    public static final String KEY_HOURS_SUNRISE = "hrs_sunrise";
-    public static final String KEY_MINUTES_SUNRISE = "min_sunrise";
-    public static final String KEY_HOURS_SUNSET = "hrs_sunset";
-    public static final String KEY_MINUTES_SUNSET = "min_sunset";
+
+    public static final String KEY_HOURS_STOP = "hour_stop";
+    public static final String KEY_MINUTES_STOP = "min_stop";
+
+    public static final String KEY_HOURS_START = "hour_start";
+    public static final String KEY_MINUTES_START = "min_start";
+
     private static final String PREF_NAME = "setting";
     private static final String TAG = "AppSetting";
     private volatile static AppSetting sInstance;
@@ -80,5 +83,9 @@ public class AppSetting {
             putInt("intensity", colorProfile.getIntensity());
             putInt("dim", colorProfile.getDimLevel());
         }
+    }
+
+    public void setRunning(boolean b) {
+        putBoolean("service_running", b);
     }
 }

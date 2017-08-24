@@ -20,6 +20,7 @@ import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.activities.MainActivity;
 import com.duy.screenfilter.model.ColorProfile;
+import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.utils.Utility;
 import com.duy.screenfilter.view.MaskView;
 
@@ -142,7 +143,7 @@ public class MaskService extends Service {
         Log.i(TAG, "Create running notification");
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent pauseIntent = new Intent();
-        pauseIntent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+        pauseIntent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
         pauseIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
         pauseIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 
@@ -170,7 +171,7 @@ public class MaskService extends Service {
         Log.i(TAG, "Create paused notification");
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent resumeIntent = new Intent();
-        resumeIntent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+        resumeIntent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
         resumeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
         resumeIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 

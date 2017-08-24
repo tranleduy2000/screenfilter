@@ -5,8 +5,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -15,6 +18,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,8 +33,8 @@ import com.duy.screenfilter.BuildConfig;
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.model.ColorProfile;
+import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.services.MaskService;
-import com.duy.screenfilter.services.TileReceiver;
 import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
 import com.duy.screenfilter.utils.Utility;
@@ -63,7 +67,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     private AppSetting mSetting;
     private boolean isAnimateRunning;
     private TextView txtColorTemp;
-
+    private StatusReceiver mStatusReceiver = new StatusReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +86,14 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 startAnimate();
             }
         });
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(Constants.ALARM_ACTION_START);
+                sendBroadcast(intent);
+            }
+        }, 3000);
     }
 
     private void closeAnimate(int x, int y) {
@@ -256,18 +268,22 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
     private void sendBroadcastStopService() {
         Intent intent = new Intent();
-        intent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+        intent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
         sendBroadcast(intent);
         isRunning = false;
+        mSetting.setRunning(false);
     }
 
     private void sendBroadcastStartService() {
+        Log.d(TAG, "sendBroadcastStartService() called");
+
         Intent intent = new Intent();
-        intent.setAction(TileReceiver.ACTION_UPDATE_STATUS);
+        intent.setAction(ActionReceiver.ACTION_UPDATE_STATUS);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
         sendBroadcast(intent);
         isRunning = true;
+        mSetting.setRunning(true);
     }
 
     private void setupSeekBar() {
@@ -418,6 +434,18 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         return false;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(Constants.ACTION_START);
+        registerReceiver(mStatusReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(mStatusReceiver);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -438,5 +466,23 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 mSwitch.toggle();
             }
         }, 500);
+    }
+
+    private class StatusReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                if (intent.getAction().equals(Constants.ALARM_ACTION_START)) {
+                    if (!mSwitch.isChecked()) {
+                        mSwitch.toggle();
+                    }
+                } else if (intent.getAction().equals(Constants.ALARM_ACTION_STOP)) {
+                    if (mSwitch.isChecked()) {
+                        mSwitch.toggle();
+                    }
+                }
+            }
+        }
     }
 }
