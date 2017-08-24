@@ -60,14 +60,6 @@ public class MaskService extends Service implements ServiceController {
     public void onDestroy() {
         super.onDestroy();
         destroyMaskView();
-        sendBroadcastStopService();
-    }
-
-    private void sendBroadcastStopService() {
-        Intent intent = new Intent();
-        intent.setAction(MainActivity.class.getCanonicalName());
-        intent.putExtra(Constants.EXTRA_EVENT_ID, Constants.EVENT_DESTORY_SERVICE);
-        sendBroadcast(intent);
     }
 
     private void createMaskView(Intent startIntent) {
@@ -171,7 +163,6 @@ public class MaskService extends Service implements ServiceController {
                 .build();
     }
 
-    // implement pause notification
     private Notification createPauseNotification() {
         Log.i(TAG, "Create paused notification");
         Intent openIntent = new Intent(this, MainActivity.class);
@@ -226,7 +217,7 @@ public class MaskService extends Service implements ServiceController {
                     pause(intent);
                     break;
                 case Constants.ACTION_STOP:
-                    this.stop(intent);
+                    stop(intent);
                     break;
                 case Constants.ACTION_UPDATE:
                     update(intent);

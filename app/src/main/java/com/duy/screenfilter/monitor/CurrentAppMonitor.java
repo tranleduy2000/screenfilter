@@ -49,6 +49,7 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
     private void startCamThread() {
         if (mCamThread == null && isScreenOn()) {
             mCamThread = new CurrentAppMonitoringThread(mMaskService);
+            mCamThread.setRunning(true);
             mCamThread.start();
         }
     }
@@ -56,14 +57,11 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
     @Override
     public void onScreenTurnOff() {
         Log.d(TAG, "onScreenTurnOff() called");
-        if (mCamThread != null) {
-            mCamThread.interrupt();
-            mCamThread = null;
-        }
+        stopCamThread();
     }
 
     public void start() {
-        Log.d(TAG, "start() called " + isMonitoring                 );
+        Log.d(TAG, "start() called " + isMonitoring);
         AppSetting appSetting = AppSetting.getInstance(mMaskService);
         if (appSetting.isSecureSuspend()) {
             if (isMonitoring) {
@@ -79,12 +77,19 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
         }
     }
 
+    private void stopCamThread() {
+        if (mCamThread != null && !mCamThread.isInterrupted()) {
+            mCamThread.setRunning(false);
+            mCamThread = null;
+        }
+    }
+
     public void stop() {
         if (!isMonitoring) {
             Log.d(TAG, "stop isMonitoring = " + isMonitoring);
         } else {
             Log.d(TAG, "stop: stop");
-            startCamThread();
+            stopCamThread();
             try {
                 mMaskService.unregisterReceiver(mScreenStateReceiver);
             } catch (Exception ignored) {

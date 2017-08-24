@@ -15,6 +15,7 @@ import com.duy.screenfilter.utils.AppSetting;
 
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by Duy on 24-Aug-17.
@@ -22,6 +23,7 @@ import java.util.TreeMap;
 
 public class CurrentAppMonitoringThread extends Thread {
     private static final String TAG = "CurrentAppMonitoringThr";
+    private final AtomicBoolean running = new AtomicBoolean();
     private MaskService mContext;
     private AppSetting appSetting;
 
@@ -97,14 +99,18 @@ public class CurrentAppMonitoringThread extends Thread {
     @Override
     public void run() {
         super.run();
-        while (!isInterrupted()) {
+        while (running.get()) {
             try {
                 String currentApp = getCurrentApp(mContext);
                 Log.d(TAG, "run currentApp = " + currentApp);
                 if (isAppSecured(currentApp)) {
-                    ActionReceiver.pauseService(mContext);
+                    if (running.get()) {
+                        ActionReceiver.pauseService(mContext);
+                    }
                 } else {
-                    ActionReceiver.startService(mContext);
+                    if (running.get()) {
+                        ActionReceiver.startService(mContext);
+                    }
                 }
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -126,5 +132,9 @@ public class CurrentAppMonitoringThread extends Thread {
             if (app.equalsIgnoreCase(s)) return true;
         }
         return false;
+    }
+
+    public void setRunning(boolean running) {
+        this.running.set(running);
     }
 }
