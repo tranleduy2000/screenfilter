@@ -2,34 +2,17 @@ package com.duy.screenfilter;
 
 public class Constants {
 
-    /**
-     * Service
-     */
-    public static final String EXTRA_ACTION = "action";
-    public static final String EXTRA_COLOR_PROFILE = "color";
+    public static final String EXTRA_ACTION = "EXTRA_ACTION";
+    public static final String EXTRA_COLOR_PROFILE = "EXTRA_COLOR_PROFILE";
 
     public static final String ALARM_ACTION_START = "com.duy.screenfilter.ALARM_ACTION_START";
     public static final String ALARM_ACTION_STOP = "com.duy.screenfilter.ALARM_ACTION_STOP";
-    public static final String ACTION_UPDATE_STATUS = "com.duy.screenfilter.ACTION_UPDATE_STATUS";
+    public static final String ACTION_UPDATE_FROM_NOTIFICATION = "com.duy.screenfilter.ACTION_UPDATE_FROM_NOTIFICATION";
 
-    public static final String ACTION_START = "start";
-    public static final String ACTION_UPDATE = "update";
-    public static final String ACTION_PAUSE = "pause";
-    public static final String ACTION_STOP = "stop";
-    public static final String ACTION_CHECK = "check";
+    public static final String ACTION_START = "ACTION_START";
+    public static final String ACTION_UPDATE = "ACTION_UPDATE";
+    public static final String ACTION_PAUSE = "ACTION_PAUSE";
+    public static final String ACTION_STOP = "ACTION_STOP";
 
-    /**
-     * Broadcast
-     */
-    public static final String EXTRA_EVENT_ID = "event_id";
-
-    /**
-     * Event
-     */
-    public static final int EVENT_CANNOT_START = 1;
-    public static final int EVENT_DESTORY_SERVICE = 2;
-    public static final int EVENT_CHECK = 3;
-
-    public static final int MODE_NORMAL = 0;
 
 }

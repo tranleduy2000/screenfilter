@@ -36,6 +36,7 @@ import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.model.ColorProfile;
 import com.duy.screenfilter.monitor.CurrentAppMonitoringThread;
+import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
@@ -268,21 +269,13 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     }
 
     private void sendBroadcastStopService() {
-        Intent intent = new Intent();
-        intent.setAction(Constants.ACTION_UPDATE_STATUS);
-        intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
-        sendBroadcast(intent);
+        ActionReceiver.stopService(this);
         isRunning = false;
         mSetting.setRunning(false);
     }
 
     private void sendBroadcastStartService() {
-        Log.d(TAG, "sendBroadcastStartService() called");
-
-        Intent intent = new Intent();
-        intent.setAction(Constants.ACTION_UPDATE_STATUS);
-        intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
-        sendBroadcast(intent);
+        ActionReceiver.startService(this);
         isRunning = true;
         mSetting.setRunning(true);
     }
@@ -442,7 +435,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_START);
         intentFilter.addAction(Constants.ACTION_STOP);
-        intentFilter.addAction(Constants.ACTION_UPDATE_STATUS);
+        intentFilter.addAction(Constants.ACTION_UPDATE_FROM_NOTIFICATION);
         registerReceiver(mStatusReceiver, intentFilter);
     }
 
@@ -481,15 +474,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             Log.d(TAG, "onReceive() called with: context = [" + context + "], intent = [" + intent + "]");
 
             if (intent != null) {
-                if (intent.getAction().equals(Constants.ALARM_ACTION_START)) {
-                    if (!mSwitch.isChecked()) {
-                        mSwitch.setChecked(true);
-                    }
-                } else if (intent.getAction().equals(Constants.ALARM_ACTION_STOP)) {
-                    if (mSwitch.isChecked()) {
-                        mSwitch.setChecked(false);
-                    }
-                } else if (intent.getAction().equals(Constants.ACTION_UPDATE_STATUS)) {
+                if (intent.getAction().equals(Constants.ACTION_UPDATE_FROM_NOTIFICATION)) {
                     String action = intent.getStringExtra(Constants.EXTRA_ACTION);
                     switch (action) {
                         case Constants.ACTION_START:

@@ -68,11 +68,6 @@ public class MaskService extends Service implements ServiceController {
             mWindowManager.addView(mMaskView, mLayoutParams);
         } catch (Exception e) {
             e.printStackTrace();
-
-            Intent intent = new Intent();
-            intent.setAction(MainActivity.class.getCanonicalName());
-            intent.putExtra(Constants.EXTRA_EVENT_ID, Constants.EVENT_CANNOT_START);
-            sendBroadcast(intent);
         }
     }
 
@@ -114,7 +109,7 @@ public class MaskService extends Service implements ServiceController {
 
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent pauseIntent = new Intent();
-        pauseIntent.setAction(Constants.ACTION_UPDATE_STATUS);
+        pauseIntent.setAction(Constants.ACTION_UPDATE_FROM_NOTIFICATION);
         pauseIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
         pauseIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 
@@ -142,7 +137,7 @@ public class MaskService extends Service implements ServiceController {
         Log.i(TAG, "Create paused notification");
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent resumeIntent = new Intent();
-        resumeIntent.setAction(Constants.ACTION_UPDATE_STATUS);
+        resumeIntent.setAction(Constants.ACTION_UPDATE_FROM_NOTIFICATION);
         resumeIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
         resumeIntent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
 
@@ -204,10 +199,13 @@ public class MaskService extends Service implements ServiceController {
 
     public void stop(@Nullable Intent intent) {
         Log.i(TAG, "Stop Mask");
-        isShowing = false;
-        mCurrentAppMonitor.stop();
-        stopForeground(true);
-        stopSelf();
+        if (status != Status.STOPPED) {
+            status = Status.STOPPED;
+            isShowing = false;
+            mCurrentAppMonitor.stop();
+            stopForeground(true);
+            stopSelf();
+        }
     }
 
     public Status getStatus() {
@@ -251,7 +249,11 @@ public class MaskService extends Service implements ServiceController {
             status = Status.UPDATING;
             mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
             if (updateLayoutParams()) {
-                mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
+                try {
+                    mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
+                } catch (Exception e) {//not attached to window manager
+                    mWindowManager.addView(mMaskView, mLayoutParams);
+                }
             }
             isShowing = true;
         } catch (Exception e) {

@@ -57,7 +57,7 @@ public class ActionReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "received \"" + intent.getAction() + "\" action");
-        if (Constants.ACTION_UPDATE_STATUS.equals(intent.getAction())) {
+        if (Constants.ACTION_UPDATE_FROM_NOTIFICATION.equals(intent.getAction())) {
             String action = intent.getStringExtra(Constants.EXTRA_ACTION);
             switch (action) {
                 case Constants.ACTION_START:
