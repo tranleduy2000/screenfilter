@@ -40,5 +40,7 @@
 	<string name="insensiti">Insensity</string>
     <string name="reading_mode">Reading mode</string>
 	<string name="dim_mode">Dim mode</string>
+    <string name="turn_off_at">Turn off at</string>
+	<string name="turn_on_at">Turn on at</string>
 
 </resources>

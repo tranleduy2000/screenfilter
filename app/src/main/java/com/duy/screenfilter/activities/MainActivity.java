@@ -60,7 +60,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     };
     private DiscreteSeekBar mColorTemp, mIntensity, mDim;
     private ImageButton mSchedulerBtn;
-    private PopupMenu popupMenu;
     private AppSetting mSetting;
     private boolean isAnimateRunning;
     private TextView txtColorTemp;
@@ -181,7 +180,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         }
 
         ImageButton menuBtn = findViewById(R.id.btn_menu);
-        popupMenu = new PopupMenu(this, menuBtn);
+        final PopupMenu popupMenu = new PopupMenu(this, menuBtn);
         popupMenu.getMenuInflater().inflate(R.menu.menu_settings, popupMenu.getMenu());
         popupMenu.getMenu()
                 .findItem(R.id.action_dark_theme)
@@ -195,7 +194,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         });
         menuBtn.setOnTouchListener(popupMenu.getDragToOpenListener());
 
-//        setupScheduler();
+        setupSchedulerDialog();
         FrameLayout rootLayout = findViewById(R.id.root_layout);
         rootLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -209,7 +208,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         });
     }
 
-    private void setupScheduler() {
+    private void setupSchedulerDialog() {
         mSchedulerBtn = findViewById(R.id.btn_scheduler);
         if (mSetting.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
             mSchedulerBtn.setImageResource(R.drawable.ic_alarm_black_24dp);

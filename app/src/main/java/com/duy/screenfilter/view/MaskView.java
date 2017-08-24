@@ -34,8 +34,8 @@ public class MaskView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (mProfile != null) {
-            synchronized (mLock) {
+        synchronized (mLock) {
+            if (mProfile != null) {
                 canvas.drawColor(mProfile.getFilterColor());
             }
         }

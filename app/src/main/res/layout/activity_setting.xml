@@ -71,8 +71,7 @@
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:src="@drawable/ic_alarm_black_24dp"
-                    android:tint="?attr/overflow_tint"
-                    android:visibility="gone"/>
+                    android:tint="?attr/overflow_tint"/>
 
                 <ImageButton
                     android:id="@+id/btn_menu"
