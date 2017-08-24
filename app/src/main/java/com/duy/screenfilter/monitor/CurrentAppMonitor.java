@@ -61,11 +61,10 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
     }
 
     public void start() {
-        Log.d(TAG, "start() called " + isMonitoring);
         AppSetting appSetting = AppSetting.getInstance(mMaskService);
         if (appSetting.isSecureSuspend()) {
             if (isMonitoring) {
-                Log.d(TAG, "start isMonitoring = " + isMonitoring);
+                Log.d(TAG, "start isMonitoring = " + true);
             } else {
                 IntentFilter intentFilter = new IntentFilter();
                 intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -86,7 +85,7 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
 
     public void stop() {
         if (!isMonitoring) {
-            Log.d(TAG, "stop isMonitoring = " + isMonitoring);
+            Log.d(TAG, "stop isMonitoring = " + false);
         } else {
             Log.d(TAG, "stop: stop");
             stopCamThread();

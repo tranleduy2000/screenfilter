@@ -75,7 +75,7 @@ public class MaskService extends Service implements ServiceController {
         }
     }
 
-    private void updateLayoutParams() {
+    private boolean updateLayoutParams() {
         if (mLayoutParams == null) {
             int max = Math.max(Utility.getTrueScreenWidth(this), Utility.getTrueScreenHeight(this));
 
@@ -94,8 +94,7 @@ public class MaskService extends Service implements ServiceController {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
         }
-        mMaskView.setProfile(mColorProfile);
-
+        return mMaskView.setProfile(mColorProfile);
     }
 
     private void destroyMaskView() {
@@ -240,11 +239,13 @@ public class MaskService extends Service implements ServiceController {
     }
 
     public void update(Intent intent) {
-        Log.i(TAG, "Update Mask");
+        Log.d(TAG, "update() called with: intent = [" + intent + "]");
+
         try {
             mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
-            updateLayoutParams();
-            mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
+            if (updateLayoutParams()) {
+                mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
+            }
             isShowing = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -266,6 +267,8 @@ public class MaskService extends Service implements ServiceController {
         return pause;
     }
 
+    enum Status {STARTED, PAUSED, RUNNING, STOPPED}
+
     public class MaskBinder extends Binder {
 
         public boolean isMaskShowing() {
@@ -273,5 +276,4 @@ public class MaskService extends Service implements ServiceController {
         }
 
     }
-
 }

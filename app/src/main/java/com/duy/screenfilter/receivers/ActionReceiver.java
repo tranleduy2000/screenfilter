@@ -15,6 +15,8 @@ public class ActionReceiver extends BroadcastReceiver {
     private static final String TAG = "TileReceiver";
 
     public static void pauseService(Context context) {
+        Log.d(TAG, "pauseService() called with: context = [" + context + "]");
+
         AppSetting settings = AppSetting.getInstance(context);
         Intent intent2 = new Intent(context, MaskService.class);
         intent2.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
@@ -23,12 +25,16 @@ public class ActionReceiver extends BroadcastReceiver {
     }
 
     public static void stopService(Context context) {
+        Log.d(TAG, "stopService() called with: context = [" + context + "]");
+
         Intent intent = new Intent(context, MaskService.class);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
         context.startService(intent);
     }
 
     public static void startService(Context context) {
+        Log.d(TAG, "startService() called with: context = [" + context + "]");
+
         Utility.updateAlarmSettings(context);
         AppSetting settings = AppSetting.getInstance(context);
         Intent intent = new Intent(context, MaskService.class);
@@ -39,6 +45,8 @@ public class ActionReceiver extends BroadcastReceiver {
 
 
     public static void updateService(Context context) {
+        Log.d(TAG, "updateService() called with: context = [" + context + "]");
+
         AppSetting settings = AppSetting.getInstance(context);
         Intent intent = new Intent(context, MaskService.class);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);

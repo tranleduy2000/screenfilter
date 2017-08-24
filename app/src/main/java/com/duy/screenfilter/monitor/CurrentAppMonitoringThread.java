@@ -26,6 +26,7 @@ public class CurrentAppMonitoringThread extends Thread {
     private final AtomicBoolean running = new AtomicBoolean();
     private MaskService mContext;
     private AppSetting appSetting;
+    private boolean isLastSecuredApp = false;
 
     public CurrentAppMonitoringThread(MaskService context) {
         this.mContext = context;
@@ -106,10 +107,12 @@ public class CurrentAppMonitoringThread extends Thread {
                 if (isAppSecured(currentApp)) {
                     if (running.get()) {
                         ActionReceiver.pauseService(mContext);
+                        isLastSecuredApp = true;
                     }
                 } else {
-                    if (running.get()) {
+                    if (running.get() && isLastSecuredApp) {
                         ActionReceiver.updateService(mContext);
+                        isLastSecuredApp = false;
                     }
                 }
                 Thread.sleep(1000);

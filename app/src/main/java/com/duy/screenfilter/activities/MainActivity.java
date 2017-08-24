@@ -71,6 +71,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
     private boolean isAnimateRunning;
     private TextView txtColorTemp;
     private StatusReceiver mStatusReceiver = new StatusReceiver();
+    private ColorProfile mColorProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -292,7 +293,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         mIntensity = findViewById(R.id.seek_bar_intensity);
         mDim = findViewById(R.id.seek_bar_dim);
 
-        final ColorProfile colorProfile = mSetting.getColorProfile();
+        mColorProfile = mSetting.getColorProfile();
         mColorTemp.setOnProgressChangeListener(new DiscreteSeekBar.OnProgressChangeListener() {
             int v = -1;
 
@@ -301,11 +302,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
                 if (isRunning) {
-                    colorProfile.setColor(value);
-                    Intent intent = new Intent(MainActivity.this, MaskService.class);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
-                    intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
-                    startService(intent);
+                    mColorProfile.setColor(value);
+                    if (fromUser) sendBroadcastUpdateService();
                 }
                 txtColorTemp.setText((500 + value * 30) + "k/3500k");
             }
@@ -318,7 +316,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             @Override
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
                 if (v != -1) {
-                    mSetting.saveColorProfile(colorProfile);
+                    mSetting.saveColorProfile(mColorProfile);
                 }
             }
         });
@@ -329,11 +327,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
                 if (isRunning) {
-                    colorProfile.setIntensity(value);
-                    Intent intent = new Intent(MainActivity.this, MaskService.class);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
-                    intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
-                    startService(intent);
+                    mColorProfile.setIntensity(value);
+                    if (fromUser) sendBroadcastUpdateService();
                 }
             }
 
@@ -345,7 +340,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             @Override
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
                 if (v != -1) {
-                    mSetting.saveColorProfile(colorProfile);
+                    mSetting.saveColorProfile(mColorProfile);
                 }
             }
         });
@@ -356,11 +351,9 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
                 if (isRunning) {
-                    colorProfile.setDimLevel(value);
-                    Intent intent = new Intent(MainActivity.this, MaskService.class);
-                    intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
-                    intent.putExtra(Constants.EXTRA_COLOR_PROFILE, colorProfile);
-                    startService(intent);
+                    mColorProfile.setDimLevel(value);
+                    if (fromUser) sendBroadcastUpdateService();
+
                 }
             }
 
@@ -372,14 +365,21 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             @Override
             public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
                 if (v != -1) {
-                    mSetting.saveColorProfile(colorProfile);
+                    mSetting.saveColorProfile(mColorProfile);
                 }
             }
         });
 
-        mColorTemp.setProgress(colorProfile.getColor());
-        mIntensity.setProgress(colorProfile.getIntensity());
-        mDim.setProgress(colorProfile.getDimLevel());
+        mColorTemp.setProgress(mColorProfile.getColor());
+        mIntensity.setProgress(mColorProfile.getIntensity());
+        mDim.setProgress(mColorProfile.getDimLevel());
+    }
+
+    private void sendBroadcastUpdateService() {
+        Intent intent = new Intent(MainActivity.this, MaskService.class);
+        intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
+        intent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
+        startService(intent);
     }
 
     private void initWindow() {
@@ -424,11 +424,13 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 mColorTemp.setProgress(20);
                 mIntensity.setProgress(60);
                 mDim.setProgress(78);
+                sendBroadcastUpdateService();
                 break;
             case R.id.action_dim_mode: //0 0 60
                 mColorTemp.setProgress(0);
                 mIntensity.setProgress(0);
                 mDim.setProgress(60);
+                sendBroadcastUpdateService();
                 break;
         }
         return false;
