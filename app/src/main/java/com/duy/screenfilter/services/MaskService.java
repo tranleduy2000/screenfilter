@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -20,13 +21,14 @@ import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.activities.MainActivity;
 import com.duy.screenfilter.model.ColorProfile;
+import com.duy.screenfilter.monitor.CurrentAppMonitor;
 import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.utils.Utility;
 import com.duy.screenfilter.view.MaskView;
 
 import static android.view.WindowManager.LayoutParams;
 
-public class MaskService extends Service {
+public class MaskService extends Service implements ServiceController {
 
     private static final int ANIMATE_DURATION_MILES = 250;
     private static final int NOTIFICATION_NO = 1024;
@@ -35,9 +37,14 @@ public class MaskService extends Service {
     private WindowManager mWindowManager;
     private NotificationManager mNotificationManager;
     private AccessibilityManager mAccessibilityManager;
+    private CurrentAppMonitor mCurrentAppMonitor;
+
+
     private Notification mNotification;
+
     private MaskView mMaskView;
     private LayoutParams mLayoutParams;
+
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
     private ColorProfile mColorProfile = null;
@@ -48,6 +55,7 @@ public class MaskService extends Service {
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mAccessibilityManager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
+        mCurrentAppMonitor = new CurrentAppMonitor(this);
     }
 
     @Override
@@ -232,30 +240,36 @@ public class MaskService extends Service {
         return START_STICKY;
     }
 
-    private void stop(Intent intent) {
+    public void stop(@Nullable Intent intent) {
         Log.i(TAG, "Stop Mask");
         isShowing = false;
+        mCurrentAppMonitor.stop();
         stopForeground(true);
         stopSelf();
     }
 
-    private void start(Intent intent) {
-        Log.i(TAG, "Start Mask");
-        if (mMaskView == null) createMaskView(intent);
-
-        createNotification();
-        startForeground(NOTIFICATION_NO, mNotification);
-
-        try {
-            updateLayoutParams();
-            mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
-            isShowing = true;
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void start(@Nullable Intent intent) {
+        if (!isShowing) {
+            Log.d(TAG, "start() called with: intent = [" + intent + "]");
+            if (mMaskView == null) {
+                createMaskView(intent);
+            }
+            createNotification();
+            startForeground(NOTIFICATION_NO, mNotification);
+            mCurrentAppMonitor.start();
+            try {
+                updateLayoutParams();
+                mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
+                isShowing = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(TAG, "start: service already started");
         }
     }
 
-    private void pause(Intent intent) {
+    public void pause(@Nullable Intent intent) {
         Log.i(TAG, "Pause Mask");
         stopForeground(true);
         destroyMaskView();
@@ -264,7 +278,7 @@ public class MaskService extends Service {
         isShowing = false;
     }
 
-    private void update(Intent intent) {
+    public void update(Intent intent) {
         Log.i(TAG, "Update Mask");
         mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
 

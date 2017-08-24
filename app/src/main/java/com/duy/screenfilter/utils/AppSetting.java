@@ -88,4 +88,8 @@ public class AppSetting {
     public void setRunning(boolean b) {
         putBoolean("service_running", b);
     }
+
+    public boolean isSecureSuspend() {
+        return getBoolean("secure_suspend", false);
+    }
 }
