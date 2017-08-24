@@ -28,7 +28,7 @@ import static android.view.WindowManager.LayoutParams;
 
 public class MaskService extends Service implements ServiceController {
 
-    private static final int ANIMATE_DURATION_MILES = 1000;
+    private static final int ANIMATE_DURATION_MILES = 700;
     private static final int NOTIFICATION_NO = 1024;
     private static final String TAG = "MaskService";
 

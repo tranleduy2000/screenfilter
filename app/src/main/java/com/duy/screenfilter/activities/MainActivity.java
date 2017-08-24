@@ -417,13 +417,21 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                 mColorTemp.setProgress(20);
                 mIntensity.setProgress(60);
                 mDim.setProgress(78);
-                sendBroadcastUpdateService();
+                if (isRunning) {
+                    sendBroadcastUpdateService();
+                } else {
+                    sendBroadcastStartService();
+                }
                 break;
             case R.id.action_dim_mode: //0 0 60
                 mColorTemp.setProgress(0);
                 mIntensity.setProgress(0);
                 mDim.setProgress(60);
-                sendBroadcastUpdateService();
+                if (isRunning) {
+                    sendBroadcastUpdateService();
+                } else {
+                    sendBroadcastStartService();
+                }
                 break;
         }
         return false;
