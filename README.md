@@ -1,11 +1,22 @@
-# Screen Filter
-
 ![](app/src/main/res/mipmap-xxhdpi/ic_launcher.png)
 
-## Material design, free, no ads, open source project.
+# Screen Filter
+This is an application that helps you to reduce eyestrain at night.
+This is an open source project to help you learn code, this is free, no ads.
 
 ## Feature
-Support change overlay color
+- Adjust color temperature
+- Adjust the color intensity
+- Adjust the opacity of the color
+- Auto on/off
+- Supports light/dark theme
+- Automatically turn off the application when the supersu dialog box or Install button, dialog permission
+
+## Screenshot
+|                      |                |                         |
+|---------------------:|---------------:|------------------------:|
+|![](art/screenshot/Screenshot_20170824-230826.png)|![](art/screenshot/Screenshot_20170824-230830.png) |![](art/screenshot/Screenshot_20170824-230834.png) |
+|![](art/screenshot/Screenshot_20170824-230842.png)| ![](art/screenshot/Screenshot_20170824-230852.png)|![](art/screenshot/Screenshot_20170824-230839.png) |
 
 ## License
 

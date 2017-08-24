@@ -3,36 +3,34 @@
     tools:ignore="MissingTranslation" >
 
     <string name="app_name">Screen Filter</string>
-
     <string name="shortcut_label_switch">Toggle</string>
-
-    <string name="action_dark_theme">Dark theme</string>
-
+    <string name="action_dark_theme">Chủ đề tối</string>
     <string name="mask_fail_to_start">Failed to start mask. Please check whether the system has denied the permissions.</string>
-
-    <string name="dialog_first_run_title">First run</string>
-    <string name="dialog_first_run_message">Can you see this message? If you can, ScreenFilter is working well.\nIt will automatically stop after 5 seconds if you don\'t press OK.</string>
-
     <string name="notification_running_title">ScreenFilter is working</string>
-    <string name="notification_running_msg">Click here to open settings</string>
+    <string name="notification_running_msg">Nhấn vào đây để mở cài đặt</string>
 
     <string name="notification_paused_title">Screen Filter đã tạm dừng</string>
     <string name="notification_paused_msg">Nhấp vào đây để mở cài đặt hoặc vuốt để dừng Screen Filter</string>
 
-    <string name="notification_action_turn_off">Turn off</string>
+    <string name="notification_action_turn_off">Tắt</string>
     <string name="notification_action_turn_on">Bật</string>
-
-    <string name="mode_text_normal">Chế độ bình thường</string>
-    <string name="mode_text_overlay_all">Lớp phủ hệ thống</string>
-
-    <string name="mode_desc_no_permission">Không cần cấp quyền. Nhưng nó không thể làm mờ màn hình khóa, thanh trạng thái hoặc thanh điều hướng. Không hoạt động trong Android 7.0.</string>
-    <string name="mode_desc_normal">Được đề nghị. Hoạt động ổn định, mặc dù không thể làm mờ thanh điều hướng và ngăn không cho nhấp vào nút \"Install\" hoặc \"Allow\" trong hộp thoại Permission.</string>
-    <string name="mode_desc_overlay_all">Bạn có thể làm mờ cả thanh trạng thái và thanh điều hướng. Tuy nhiên, nó có thể làm màn hình bị chớp trong một số ứng dụng.</string>
 
     <string name="scheduler_title">Chế độ tự động</string>
 
     <string name="dialog_ignore_battery_opt_title">Lời khuyên</string>
     <string name="dialog_button_go_to_set">Đi tới cài đặt</string>
-    <string name="dialog_ignore_battery_opt_msg">It may not automatically activate/deactivate on time because of Android 6.0 Doze mode. If you have any problem, try to request system to ignore battery optimization.</string>
+    <string name="dialog_ignore_battery_opt_msg">Chế độ này có thể không tự động kích hoạt/hủy kích hoạt đúng giờ do chế độ Doze từ Android 6.0 trở lên. Nếu bạn có bất kỳ vấn đề, hãy thử yêu cầu hệ thống bỏ qua tối ưu hóa pin.</string>
+    <string name="color_temperature">Nhiệt độ màu</string>
+    <string name="dim_level">Độ mờ</string>
+    <string name="dim_mode">Chế độ mờ</string>
+    <string name="intensity">Cường độ màu</string>
+    <string name="mode">Chế độ</string>
+    <string name="need_permission">Yêu cầu quyền</string>
+    <string name="play_store">Đi tới PlayStore</string>
+    <string name="turn_off_at">Tắt vào lúc</string>
+    <string name="turn_on_at">Bật vào lúc</string>
+    <string name="reading_mode">Chế độ đọc sách</string>
+    <string name="msg_draw_permission">Bạn cần phải cho phép ứng dụng vẽ trên màn hình của bạn.</string>
+    <string name="msg_auto_suspend">Trong một số trường hợp, bạn không thể nhấn nút \"Cài đặt\" hoặc hộp thoại yêu cầu \"Permission\". Bạn cần cấp quyền này cho ứng dụng để nó có thể tự động vô hiệu.</string>
 
 </resources>
