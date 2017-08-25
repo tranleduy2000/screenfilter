@@ -61,7 +61,7 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
     }
 
     public void start() {
-        AppSetting appSetting = AppSetting.getInstance(mMaskService);
+        AppSetting appSetting = AppSetting.newInstance(mMaskService);
         if (appSetting.isSecureSuspend()) {
             if (isMonitoring) {
                 Log.d(TAG, "start isMonitoring = " + true);

@@ -33,7 +33,7 @@ public class ActionReceiver extends BroadcastReceiver {
         Log.d(TAG, "startService() called with: context = [" + context + "]");
 
         Utility.updateAlarmSettings(context);
-        AppSetting settings = AppSetting.getInstance(context);
+        AppSetting settings = AppSetting.newInstance(context);
         Intent intent = new Intent(context, MaskService.class);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
         intent.putExtra(Constants.EXTRA_COLOR_PROFILE, settings.getColorProfile());
@@ -44,7 +44,7 @@ public class ActionReceiver extends BroadcastReceiver {
     public static void updateService(Context context) {
         Log.d(TAG, "updateService() called with: context = [" + context + "]");
 
-        AppSetting settings = AppSetting.getInstance(context);
+        AppSetting settings = AppSetting.newInstance(context);
         Intent intent = new Intent(context, MaskService.class);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
         intent.putExtra(Constants.EXTRA_COLOR_PROFILE, settings.getColorProfile());

@@ -29,7 +29,7 @@ public class CurrentAppMonitoringThread extends Thread {
 
     public CurrentAppMonitoringThread(MaskService context) {
         this.mContext = context;
-        this.appSetting = AppSetting.getInstance(context.getApplicationContext());
+        this.appSetting = AppSetting.newInstance(context.getApplicationContext());
     }
 
     @Nullable

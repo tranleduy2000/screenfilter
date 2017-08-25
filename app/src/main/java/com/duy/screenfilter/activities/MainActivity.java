@@ -12,7 +12,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
@@ -48,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     private static final int REQUEST_USAGE_ACCESS = 1002;
 
     private static final String TAG = "MainActivity";
-    private final Handler mHandler = new Handler();
     public boolean isRunning = false;
     private Switch mSwitch;
     private DiscreteSeekBar mColorTemp, mIntensity, mDim;
@@ -62,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSetting = AppSetting.getInstance(getApplicationContext());
+        mSetting = AppSetting.newInstance(getApplicationContext());
         initWindow();
         changeTheme();
         setContentView(R.layout.activity_setting);
@@ -312,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
                 mColorProfile.setColor(value);
-                if (isRunning) if (fromUser) sendBroadcastUpdateService();
+                if (isRunning) if (fromUser) updateColorFilter();
                 txtColorTemp.setText((500 + value * 30) + "k/3500k");
             }
 
@@ -335,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
                 mColorProfile.setIntensity(value);
-                if (isRunning) if (fromUser) sendBroadcastUpdateService();
+                if (isRunning) if (fromUser) updateColorFilter();
             }
 
             @Override
@@ -357,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
                 mColorProfile.setDimLevel(value);
-                if (isRunning) if (fromUser) sendBroadcastUpdateService();
+                if (isRunning) if (fromUser) updateColorFilter();
             }
 
             @Override
@@ -378,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         mDim.setProgress(mColorProfile.getDimLevel());
     }
 
-    private void sendBroadcastUpdateService() {
+    private void updateColorFilter() {
         Intent intent = new Intent(MainActivity.this, MaskService.class);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_UPDATE);
         intent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
@@ -427,21 +425,15 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 mColorTemp.setProgress(20);
                 mIntensity.setProgress(60);
                 mDim.setProgress(78);
-                if (isRunning) {
-                    sendBroadcastUpdateService();
-                } else {
-                    sendBroadcastStartService();
-                }
+                if (isRunning) updateColorFilter();
+                else sendBroadcastStartService();
                 break;
             case R.id.action_dim_mode: //0 0 60
                 mColorTemp.setProgress(0);
                 mIntensity.setProgress(0);
                 mDim.setProgress(60);
-                if (isRunning) {
-                    sendBroadcastUpdateService();
-                } else {
-                    sendBroadcastStartService();
-                }
+                if (isRunning) updateColorFilter();
+                else sendBroadcastStartService();
                 break;
         }
         return false;
@@ -458,8 +450,8 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         unregisterReceiver(mStatusReceiver);
     }
 
@@ -483,10 +475,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 finish();
             }
         }
-    }
-
-    private void refresh() {
-        mSwitch.toggle();
     }
 
     private class StatusReceiver extends BroadcastReceiver {

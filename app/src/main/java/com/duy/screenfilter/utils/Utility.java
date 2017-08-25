@@ -47,7 +47,7 @@ public class Utility {
 
 
     public static void updateAlarmSettings(Context context) {
-        AppSetting settings = AppSetting.getInstance(context);
+        AppSetting settings = AppSetting.newInstance(context);
         if (settings.getBoolean(AppSetting.KEY_AUTO_MODE, false)) {
             int hrsSunrise = settings.getInt(AppSetting.KEY_HOURS_STOP, 6);
             int minSunrise = settings.getInt(AppSetting.KEY_MINUTES_STOP, 0);

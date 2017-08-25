@@ -11,7 +11,7 @@ public class ScreenFilterApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Utility.updateAlarmSettings(this);
-        AppSetting.getInstance(this);
+        AppSetting.newInstance(this);
     }
 
 }

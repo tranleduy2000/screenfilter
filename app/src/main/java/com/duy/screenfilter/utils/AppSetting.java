@@ -18,18 +18,14 @@ public class AppSetting {
 
     private static final String PREF_NAME = "setting";
     private static final String TAG = "AppSetting";
-    private volatile static AppSetting sInstance;
     private SharedPreferences mPrefs;
 
     private AppSetting(Context context) {
         this.mPrefs = context.getSharedPreferences(PREF_NAME, Context.MODE_MULTI_PROCESS);
     }
 
-    public static AppSetting getInstance(Context context) {
-        if (sInstance == null) {
-            sInstance = new AppSetting(context);
-        }
-        return sInstance;
+    public static AppSetting newInstance(Context context) {
+        return new AppSetting(context);
     }
 
     public AppSetting putBoolean(String key, boolean value) {
