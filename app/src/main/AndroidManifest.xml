@@ -45,6 +45,7 @@
         </activity>
 
         <service
+            android:process=":mask_service"
             android:name=".services.MaskService"/>
 
         <receiver

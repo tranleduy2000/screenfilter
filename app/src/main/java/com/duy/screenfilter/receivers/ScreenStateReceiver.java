@@ -1,4 +1,4 @@
-package com.duy.screenfilter.monitor;
+package com.duy.screenfilter.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

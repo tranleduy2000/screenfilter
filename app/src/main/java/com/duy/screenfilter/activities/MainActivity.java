@@ -149,6 +149,9 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             } else {
                 mSwitch.setChecked(false);
             }
+            isRunning = true;
+        } else {
+            isRunning = false;
         }
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

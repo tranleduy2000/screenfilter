@@ -43,7 +43,6 @@ public class MaskService extends Service implements ServiceController {
     private boolean isShowing = false;
     private MaskBinder mBinder = new MaskBinder();
     private ColorProfile mColorProfile = null;
-    private boolean pause;
     private Status status;
 
     @Override
@@ -269,10 +268,6 @@ public class MaskService extends Service implements ServiceController {
     @Override
     public boolean onUnbind(Intent intent) {
         return super.onUnbind(intent);
-    }
-
-    public boolean isPause() {
-        return pause;
     }
 
     enum Status {STARTING, PAUSED, UPDATING, STOPPED}

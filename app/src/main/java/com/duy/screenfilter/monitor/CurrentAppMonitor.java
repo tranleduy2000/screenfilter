@@ -8,6 +8,7 @@ import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.duy.screenfilter.receivers.ScreenStateReceiver;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.utils.AppSetting;
 
