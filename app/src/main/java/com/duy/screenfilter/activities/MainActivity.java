@@ -222,6 +222,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                                 Uri uri = Uri.parse("package:" + getPackageName());
                                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, uri);
                                 startActivityForResult(intent, REQUEST_OVERLAY_PERMISSION);
+                                dialogInterface.cancel();
                             }
                         })
                         .create()
@@ -238,6 +239,7 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
                         public void onClick(DialogInterface dialogInterface, int i) {
                             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                             startActivityForResult(intent, REQUEST_USAGE_ACCESS);
+                            dialogInterface.cancel();
                         }
                     })
                     .create()
