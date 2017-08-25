@@ -12,6 +12,7 @@ public class ScreenFilterApplication extends Application {
         super.onCreate();
         Utility.updateAlarmSettings(this);
         AppSetting.newInstance(this);
+//        if (BuildConfig.DEBUG) FirebaseCrash.setCrashCollectionEnabled(false);
     }
 
 }
