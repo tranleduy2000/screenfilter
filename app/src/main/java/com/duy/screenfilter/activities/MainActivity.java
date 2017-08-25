@@ -2,7 +2,6 @@ package com.duy.screenfilter.activities;
 
 import android.animation.Animator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,10 +13,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -44,28 +43,15 @@ import com.duy.screenfilter.utils.Utility;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
-public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickListener {
+public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     private static final int REQUEST_OVERLAY_PERMISSION = 1001;
     private static final int REQUEST_USAGE_ACCESS = 1002;
 
     private static final String TAG = "MainActivity";
+    private final Handler mHandler = new Handler();
     public boolean isRunning = false;
     private Switch mSwitch;
-    private final Handler mHandler = new Handler() {
-
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what < 10) {
-                if (mSwitch == null) {
-                    mHandler.sendEmptyMessageDelayed(msg.what + 1, 100);
-                } else {
-                    mSwitch.toggle();
-                }
-            }
-        }
-
-    };
     private DiscreteSeekBar mColorTemp, mIntensity, mDim;
     private ImageButton mSchedulerBtn;
     private AppSetting mSetting;
@@ -320,10 +306,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             @Override
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
-                if (isRunning) {
-                    mColorProfile.setColor(value);
-                    if (fromUser) sendBroadcastUpdateService();
-                }
+                mColorProfile.setColor(value);
+                if (isRunning) if (fromUser) sendBroadcastUpdateService();
                 txtColorTemp.setText((500 + value * 30) + "k/3500k");
             }
 
@@ -345,10 +329,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             @Override
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
-                if (isRunning) {
-                    mColorProfile.setIntensity(value);
-                    if (fromUser) sendBroadcastUpdateService();
-                }
+                mColorProfile.setIntensity(value);
+                if (isRunning) if (fromUser) sendBroadcastUpdateService();
             }
 
             @Override
@@ -369,11 +351,8 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
             @Override
             public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
                 v = value;
-                if (isRunning) {
-                    mColorProfile.setDimLevel(value);
-                    if (fromUser) sendBroadcastUpdateService();
-
-                }
+                mColorProfile.setDimLevel(value);
+                if (isRunning) if (fromUser) sendBroadcastUpdateService();
             }
 
             @Override
@@ -484,7 +463,12 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
         if (requestCode == REQUEST_OVERLAY_PERMISSION) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (Settings.canDrawOverlays(this)) {
-                    refresh();
+                    mSwitch.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSwitch.setChecked(true);
+                        }
+                    });
                 } else {
                     finish();
                 }
@@ -498,12 +482,6 @@ public class MainActivity extends Activity implements PopupMenu.OnMenuItemClickL
 
     private void refresh() {
         mSwitch.toggle();
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mSwitch.toggle();
-            }
-        }, 500);
     }
 
     private class StatusReceiver extends BroadcastReceiver {
