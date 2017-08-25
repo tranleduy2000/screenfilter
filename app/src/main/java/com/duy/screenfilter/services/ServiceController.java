@@ -11,4 +11,6 @@ public interface ServiceController {
     void stop(@Nullable Intent intent);
 
     void update(@Nullable Intent intent);
+
+    boolean isPause();
 }

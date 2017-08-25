@@ -11,10 +11,8 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.accessibility.AccessibilityManager;
 
 import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
@@ -34,8 +32,8 @@ public class MaskService extends Service implements ServiceController {
 
     private WindowManager mWindowManager;
     private NotificationManager mNotificationManager;
-    private AccessibilityManager mAccessibilityManager;
     private CurrentAppMonitor mCurrentAppMonitor;
+    private Notification mNotificationPause, mNotificationRunning;
 
     private MaskView mMaskView;
     private LayoutParams mLayoutParams;
@@ -44,14 +42,16 @@ public class MaskService extends Service implements ServiceController {
     private MaskBinder mBinder = new MaskBinder();
     private ColorProfile mColorProfile = null;
     private Status status;
+    private int screenWidth, screenHeight;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mAccessibilityManager = (AccessibilityManager) getSystemService(Context.ACCESSIBILITY_SERVICE);
         mCurrentAppMonitor = new CurrentAppMonitor(this);
+        screenWidth = Utility.getTrueScreenWidth(this);
+        screenHeight = Utility.getTrueScreenHeight(this);
     }
 
     @Override
@@ -72,16 +72,14 @@ public class MaskService extends Service implements ServiceController {
 
     private boolean updateLayoutParams() {
         if (mLayoutParams == null) {
-            int max = Math.max(Utility.getTrueScreenWidth(this), Utility.getTrueScreenHeight(this));
-
+            int max = Math.max(screenWidth, screenHeight);
             mLayoutParams = new LayoutParams();
             mLayoutParams.type = LayoutParams.TYPE_SYSTEM_OVERLAY;
-            mLayoutParams.height = mLayoutParams.width = max + 200;
+            mLayoutParams.height = mLayoutParams.width = max + 50;
             mLayoutParams.flags |= LayoutParams.FLAG_NOT_TOUCHABLE;
             mLayoutParams.flags |= LayoutParams.FLAG_NOT_FOCUSABLE;
             mLayoutParams.flags |= LayoutParams.FLAG_LAYOUT_NO_LIMITS;
             mLayoutParams.format = PixelFormat.TRANSPARENT;
-            mLayoutParams.gravity = Gravity.CENTER;
         }
         if (mMaskView == null) {
             mMaskView = new MaskView(this);
@@ -93,22 +91,18 @@ public class MaskService extends Service implements ServiceController {
     }
 
     private void destroyMaskView() {
-        isShowing = false;
-        cancelNotification();
         if (mMaskView != null) {
-            mMaskView.animate()
-                    .alpha(0f)
-                    .setDuration(ANIMATE_DURATION_MILES).start();
+            mMaskView.animate().alpha(0f).setDuration(ANIMATE_DURATION_MILES).start();
+            mWindowManager.removeViewImmediate(mMaskView);
             mMaskView = null;
         }
     }
 
     private Notification createRunningNotification() {
         Log.i(TAG, "Create running notification");
-
+        if (mNotificationRunning != null) return mNotificationRunning;
         Intent openIntent = new Intent(this, MainActivity.class);
-        Intent pauseIntent = new Intent();
-        pauseIntent.setAction(Constants.ACTION_UPDATE_FROM_NOTIFICATION);
+        Intent pauseIntent = new Intent(Constants.ACTION_UPDATE_FROM_NOTIFICATION);
         pauseIntent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_PAUSE);
 
         Notification.Action pauseAction = new Notification.Action(
@@ -118,7 +112,7 @@ public class MaskService extends Service implements ServiceController {
 
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, openIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        return new Notification.Builder(getApplicationContext())
+        mNotificationRunning = new Notification.Builder(getApplicationContext())
                 .setContentTitle(getString(R.string.notification_running_title))
                 .setContentText(getString(R.string.notification_running_msg))
                 .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
@@ -129,9 +123,13 @@ public class MaskService extends Service implements ServiceController {
                 .setOnlyAlertOnce(true)
                 .setShowWhen(false)
                 .build();
+        return mNotificationRunning;
     }
 
     private Notification createPauseNotification() {
+        if (mNotificationPause != null) {
+            return mNotificationPause;
+        }
         Log.i(TAG, "Create paused notification");
         Intent openIntent = new Intent(this, MainActivity.class);
         Intent resumeIntent = new Intent();
@@ -146,7 +144,7 @@ public class MaskService extends Service implements ServiceController {
                 getString(R.string.notification_action_turn_on),
                 PendingIntent.getBroadcast(getBaseContext(), 0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 
-        return new Notification.Builder(getApplicationContext())
+        mNotificationPause = new Notification.Builder(getApplicationContext())
                 .setContentTitle(getString(R.string.notification_paused_title))
                 .setContentText(getString(R.string.notification_paused_msg))
                 .setSmallIcon(R.drawable.ic_brightness_2_white_36dp)
@@ -158,6 +156,7 @@ public class MaskService extends Service implements ServiceController {
                 .setShowWhen(false)
                 .setDeleteIntent(PendingIntent.getService(getBaseContext(), 0, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .build();
+        return mNotificationPause;
     }
 
     private void showPausedNotification() {
@@ -211,41 +210,52 @@ public class MaskService extends Service implements ServiceController {
     }
 
     public void start(@Nullable Intent intent) {
-        if (!isShowing) {
+        Log.d(TAG, "start() called with: intent = [" + intent + "]");
+
+        if (status == Status.PAUSED) {
             try {
                 status = Status.STARTING;
                 createMaskView(intent);
 
                 startForeground(NOTIFICATION_NO, createRunningNotification());
                 mCurrentAppMonitor.start();
-
-                updateLayoutParams();
-                mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
-
                 isShowing = true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            Log.d(TAG, "start: service already started");
+            try {
+                Log.d(TAG, "start: service already started");
+                status = Status.STARTING;
+                createMaskView(intent);
+                mNotificationManager.notify(NOTIFICATION_NO, createRunningNotification());
+                isShowing = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void pause(@Nullable Intent intent) {
-        Log.i(TAG, "Pause Mask");
+        Log.d(TAG, "pause() called with: intent = [" + intent + "]");
+
         if (status != Status.PAUSED) {
             status = Status.PAUSED;
-            stopForeground(true);
             destroyMaskView();
+            cancelNotification();
             showPausedNotification();
             isShowing = false;
+        } else {
+            Log.d(TAG, "pause: service already paused");
         }
     }
 
-    public void update(Intent intent) {
+    public void update(@Nullable Intent intent) {
         try {
             status = Status.UPDATING;
-            mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
+            if (intent != null) {
+                mColorProfile = (ColorProfile) intent.getSerializableExtra(Constants.EXTRA_COLOR_PROFILE);
+            }
             if (updateLayoutParams()) {
                 try {
                     mWindowManager.updateViewLayout(mMaskView, mLayoutParams);
@@ -258,6 +268,11 @@ public class MaskService extends Service implements ServiceController {
             e.printStackTrace();
             isShowing = false;
         }
+    }
+
+    @Override
+    public boolean isPause() {
+        return status == Status.PAUSED;
     }
 
     @Override

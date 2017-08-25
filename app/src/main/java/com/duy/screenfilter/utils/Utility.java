@@ -41,7 +41,6 @@ public class Utility {
         DisplayMetrics dm = new DisplayMetrics();
         display.getRealMetrics(dm);
         int dpi = dm.widthPixels;
-
         return dpi;
     }
 

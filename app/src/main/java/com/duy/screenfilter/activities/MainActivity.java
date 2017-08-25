@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
                 if (isChecked) {
                     sendBroadcastStartService();
                 } else {
-                    sendBroadcastStopService();
+                    stopService();
                 }
             }
         });
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
 
     }
 
-    private void sendBroadcastStopService() {
+    private void stopService() {
         Intent intent = new Intent(this, MaskService.class);
         intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
         startService(intent);
@@ -486,7 +486,6 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "onReceive() called with: context = [" + context + "], intent = [" + intent + "]");
-
             if (intent != null) {
                 if (intent.getAction().equals(Constants.ACTION_UPDATE_FROM_NOTIFICATION)) {
                     String action = intent.getStringExtra(Constants.EXTRA_ACTION);

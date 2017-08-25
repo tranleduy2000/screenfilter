@@ -7,10 +7,10 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
-import com.duy.screenfilter.receivers.ActionReceiver;
+import com.duy.screenfilter.BuildConfig;
 import com.duy.screenfilter.services.MaskService;
-import com.duy.screenfilter.utils.AppSetting;
 
 import java.util.List;
 import java.util.TreeMap;
@@ -24,12 +24,10 @@ public class CurrentAppMonitoringThread extends Thread {
     private static final String TAG = "CurrentAppMonitoringThr";
     private final AtomicBoolean running = new AtomicBoolean();
     private MaskService mContext;
-    private AppSetting appSetting;
     private boolean isLastSecuredApp = false;
 
     public CurrentAppMonitoringThread(MaskService context) {
         this.mContext = context;
-        this.appSetting = AppSetting.newInstance(context.getApplicationContext());
     }
 
     @Nullable
@@ -101,15 +99,18 @@ public class CurrentAppMonitoringThread extends Thread {
         super.run();
         while (running.get()) {
             try {
-                String currentApp = getCurrentApp(mContext);
-                if (isAppSecured(currentApp)) {
-                    if (running.get() && !isLastSecuredApp) {
-                        ActionReceiver.pauseService(mContext);
-                        isLastSecuredApp = true;
+                if (!mContext.isPause()) {
+                    String currentApp = getCurrentApp(mContext);
+                    if (BuildConfig.DEBUG) Log.d(TAG, "run currentApp = " + currentApp);
+                    if (isAppSecured(currentApp)) {
+                        if (running.get() && !isLastSecuredApp) {
+                            mContext.pause(null);
+                            isLastSecuredApp = true;
+                        }
                     }
                 } else {
                     if (running.get() && isLastSecuredApp) {
-                        ActionReceiver.updateService(mContext);
+                        mContext.update(null);
                         isLastSecuredApp = false;
                     }
                 }
@@ -133,6 +134,10 @@ public class CurrentAppMonitoringThread extends Thread {
             if (app.equalsIgnoreCase(s)) return true;
         }
         return false;
+    }
+
+    public boolean isRunning() {
+        return running.get();
     }
 
     public void setRunning(boolean running) {

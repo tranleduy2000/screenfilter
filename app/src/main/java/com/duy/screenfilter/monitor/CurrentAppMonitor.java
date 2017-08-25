@@ -63,6 +63,7 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
 
     public void start() {
         AppSetting appSetting = AppSetting.newInstance(mMaskService);
+        stopCamThread();
         if (appSetting.isSecureSuspend()) {
             if (isMonitoring) {
                 Log.d(TAG, "start isMonitoring = " + true);
@@ -78,7 +79,7 @@ public class CurrentAppMonitor implements ScreenStateReceiver.ScreenStateListene
     }
 
     private void stopCamThread() {
-        if (mCamThread != null && !mCamThread.isInterrupted()) {
+        if (mCamThread != null && mCamThread.isRunning()) {
             mCamThread.setRunning(false);
             mCamThread = null;
         }
