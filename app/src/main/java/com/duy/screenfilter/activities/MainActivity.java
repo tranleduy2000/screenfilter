@@ -35,7 +35,6 @@ import com.duy.screenfilter.Constants;
 import com.duy.screenfilter.R;
 import com.duy.screenfilter.model.ColorProfile;
 import com.duy.screenfilter.monitor.CurrentAppMonitoringThread;
-import com.duy.screenfilter.receivers.ActionReceiver;
 import com.duy.screenfilter.services.MaskService;
 import com.duy.screenfilter.ui.SchedulerDialog;
 import com.duy.screenfilter.utils.AppSetting;
@@ -281,13 +280,19 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
     }
 
     private void sendBroadcastStopService() {
-        ActionReceiver.stopService(this);
+        Intent intent = new Intent(this, MaskService.class);
+        intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_STOP);
+        startService(intent);
         isRunning = false;
         mSetting.setRunning(false);
     }
 
     private void sendBroadcastStartService() {
-        ActionReceiver.startService(this);
+        Utility.updateAlarmSettings(this);
+        Intent intent = new Intent(this, MaskService.class);
+        intent.putExtra(Constants.EXTRA_ACTION, Constants.ACTION_START);
+        intent.putExtra(Constants.EXTRA_COLOR_PROFILE, mColorProfile);
+        startService(intent);
         isRunning = true;
         mSetting.setRunning(true);
     }

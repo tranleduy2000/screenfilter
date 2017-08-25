@@ -33,7 +33,7 @@ public class AppSetting {
     }
 
     public AppSetting putBoolean(String key, boolean value) {
-        mPrefs.edit().putBoolean(key, value).apply();
+        mPrefs.edit().putBoolean(key, value).commit();
         return this;
     }
 
@@ -42,7 +42,7 @@ public class AppSetting {
     }
 
     public AppSetting putInt(String key, int value) {
-        mPrefs.edit().putInt(key, value).apply();
+        mPrefs.edit().putInt(key, value).commit();
         return this;
     }
 
@@ -56,7 +56,7 @@ public class AppSetting {
     }
 
     public AppSetting putString(String key, String value) {
-        mPrefs.edit().putString(key, value).apply();
+        mPrefs.edit().putString(key, value).commit();
         return this;
     }
 
