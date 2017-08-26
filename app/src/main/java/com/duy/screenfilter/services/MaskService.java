@@ -75,7 +75,7 @@ public class MaskService extends Service implements ServiceController {
             int max = Math.max(screenWidth, screenHeight);
             mLayoutParams = new LayoutParams();
             mLayoutParams.type = LayoutParams.TYPE_SYSTEM_OVERLAY;
-            mLayoutParams.height = mLayoutParams.width = max + 50;
+            mLayoutParams.height = mLayoutParams.width = max + 200;
             mLayoutParams.flags |= LayoutParams.FLAG_NOT_TOUCHABLE;
             mLayoutParams.flags |= LayoutParams.FLAG_NOT_FOCUSABLE;
             mLayoutParams.flags |= LayoutParams.FLAG_LAYOUT_NO_LIMITS;
@@ -92,9 +92,13 @@ public class MaskService extends Service implements ServiceController {
 
     private void destroyMaskView() {
         if (mMaskView != null) {
-            mMaskView.animate().alpha(0f).setDuration(ANIMATE_DURATION_MILES).start();
-            mWindowManager.removeViewImmediate(mMaskView);
-            mMaskView = null;
+            try {
+//                mMaskView.animate().alpha(0f).setDuration(ANIMATE_DURATION_MILES).start();
+                mWindowManager.removeViewImmediate(mMaskView);
+                mMaskView = null;
+            }catch (Exception e){
+
+            }
         }
     }
 
